@@ -69,11 +69,28 @@
         </div>
 
         <button type="submit" class="btn-primary" id="login-btn">Continue →</button>
-        <div class="msg" id="login-error"></div>
+
+        <!-- ERROR BOX — themed to match dark gold UI -->
+        <div
+          id="login-error"
+          style="
+            display: none;
+            margin-top: 14px;
+            padding: 11px 15px;
+            border-radius: 8px;
+            background: rgba(200, 169, 110, 0.08);
+            border: 1px solid rgba(200, 169, 110, 0.3);
+            color: #c8a96e;
+            font-size: 13.5px;
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.5;
+            letter-spacing: 0.01em;
+          "
+        ></div>
       </form>
 
       <div class="card-footer">
-        Don't have an account? <a href="register.html">Register here</a>
+        Don't have an account? <a href="/register">Register here</a>
       </div>
     </div>
 
@@ -109,8 +126,42 @@
         <div class="otp-expiry">Code expires in <span id="otp-timer">5:00</span></div>
 
         <button type="submit" class="btn-primary" id="otp-btn" style="margin-top:16px;">Verify &amp; Login</button>
-        <div class="msg" id="otp-error"></div>
-        <div class="msg" id="otp-success"></div>
+
+        <!-- OTP error box — gold themed -->
+        <div
+          id="otp-error"
+          style="
+            display: none;
+            margin-top: 12px;
+            padding: 11px 15px;
+            border-radius: 8px;
+            background: rgba(200, 169, 110, 0.08);
+            border: 1px solid rgba(200, 169, 110, 0.3);
+            color: #c8a96e;
+            font-size: 13.5px;
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.5;
+            letter-spacing: 0.01em;
+          "
+        ></div>
+
+        <!-- OTP success box — muted green to complement gold -->
+        <div
+          id="otp-success"
+          style="
+            display: none;
+            margin-top: 12px;
+            padding: 11px 15px;
+            border-radius: 8px;
+            background: rgba(100, 180, 130, 0.08);
+            border: 1px solid rgba(100, 180, 130, 0.25);
+            color: #7ec8a0;
+            font-size: 13.5px;
+            font-family: 'DM Sans', sans-serif;
+            line-height: 1.5;
+            letter-spacing: 0.01em;
+          "
+        ></div>
       </form>
 
       <div class="actions-row">
@@ -120,9 +171,9 @@
     </div>
 
   </div><!-- /card -->
-</div><!-- /wrapper ← footer goes AFTER this, not inside -->
+</div><!-- /wrapper -->
 
-<!-- ✅ FOOTER: outside .login-wrapper so it spans full width -->
+<!-- FOOTER -->
 <footer style="width:100%;background:#0e0f14;border-top:1px solid #1e2029;padding:18px 24px;font-family:'DM Sans','Segoe UI',sans-serif;font-size:13px;color:#4b5068;box-sizing:border-box;">
   <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
     <span>© 2025 Aariva</span>
@@ -142,7 +193,7 @@
 
 <script>
   function togglePassword() {
-    const pw = document.getElementById('password');
+    const pw   = document.getElementById('password');
     const icon = document.getElementById('eye-icon');
     const isHidden = pw.type === 'password';
     pw.type = isHidden ? 'text' : 'password';
@@ -153,25 +204,26 @@
 
   function updateStepsIndicator(step) {
     if (step === 2) {
-      document.getElementById('dot-1').className = 'step-dot done';
+      document.getElementById('dot-1').className   = 'step-dot done';
       document.getElementById('dot-1').textContent = '✓';
-      document.getElementById('line-1').className = 'step-line done';
-      document.getElementById('dot-2').className = 'step-dot active';
+      document.getElementById('line-1').className  = 'step-line done';
+      document.getElementById('dot-2').className   = 'step-dot active';
     } else {
-      document.getElementById('dot-1').className = 'step-dot active';
+      document.getElementById('dot-1').className   = 'step-dot active';
       document.getElementById('dot-1').textContent = '1';
-      document.getElementById('line-1').className = 'step-line';
-      document.getElementById('dot-2').className = 'step-dot inactive';
+      document.getElementById('line-1').className  = 'step-line';
+      document.getElementById('dot-2').className   = 'step-dot inactive';
     }
   }
 
-  const _origShowOTPStep = typeof showOTPStep !== 'undefined' ? showOTPStep : null;
+  // Patch showOTPStep to also update the steps indicator and start timer
+  const _origShowOTPStep = window.showOTPStep;
   window.showOTPStep = function(email) {
     if (_origShowOTPStep) _origShowOTPStep(email);
     updateStepsIndicator(2);
     startOTPTimer();
     setTimeout(() => document.getElementById('otp-0')?.focus(), 100);
-  }
+  };
 
   let otpTimerInterval = null;
   function startOTPTimer(seconds = 300) {
@@ -188,7 +240,7 @@
       if (remaining < 0) {
         clearInterval(otpTimerInterval);
         timerEl.textContent = 'Expired';
-        timerEl.style.color = 'var(--error)';
+        timerEl.style.color = '#e74c3c';
       }
     }, 1000);
   }
@@ -196,46 +248,53 @@
   (function initOTPBoxes() {
     const boxes = Array.from(document.querySelectorAll('.otp-box'));
     if (!boxes.length) return;
+
     boxes.forEach((box, i) => {
       box.addEventListener('keydown', (e) => {
         if (e.key === 'Backspace') {
           if (box.value) { box.value = ''; box.classList.remove('filled'); }
           else if (i > 0) { boxes[i-1].focus(); boxes[i-1].value = ''; boxes[i-1].classList.remove('filled'); }
-          e.preventDefault(); return;
+          e.preventDefault();
+          return;
         }
         if (e.key === 'ArrowLeft'  && i > 0) { boxes[i-1].focus(); return; }
         if (e.key === 'ArrowRight' && i < 5) { boxes[i+1].focus(); return; }
         if (!/^[0-9]$/.test(e.key) && !['Tab','Enter'].includes(e.key)) e.preventDefault();
       });
+
       box.addEventListener('input', (e) => {
         const val = e.target.value.replace(/\D/g, '');
         if (val.length > 1) {
-          val.split('').forEach((ch, j) => { if (boxes[j]) { boxes[j].value = ch; boxes[j].classList.add('filled'); } });
-          boxes[Math.min(val.length, 5)].focus(); return;
+          val.split('').forEach((ch, j) => {
+            if (boxes[j]) { boxes[j].value = ch; boxes[j].classList.add('filled'); }
+          });
+          boxes[Math.min(val.length, 5)].focus();
+          return;
         }
         box.value = val;
         if (val) { box.classList.add('filled'); if (i < 5) boxes[i+1].focus(); }
         else box.classList.remove('filled');
       });
+
       box.addEventListener('focus', () => box.select());
     });
+
     const otpForm = document.getElementById('otp-form');
     if (otpForm) {
-      otpForm.addEventListener('submit', function() {
+      otpForm.addEventListener('submit', function () {
         const code = boxes.map(b => b.value).join('');
         window.__otpValue = code;
         let hidden = document.getElementById('otp-input');
-        if (!hidden) { hidden = document.createElement('input'); hidden.type = 'hidden'; hidden.id = 'otp-input'; otpForm.appendChild(hidden); }
+        if (!hidden) {
+          hidden = document.createElement('input');
+          hidden.type = 'hidden';
+          hidden.id   = 'otp-input';
+          otpForm.appendChild(hidden);
+        }
         hidden.value = code;
       }, true);
     }
   })();
-
-  function showMsg(el, type, text) { if (!el) return; el.textContent = text; el.className = 'msg ' + type; }
-  function hideMsg(el) { if (!el) return; el.textContent = ''; el.className = 'msg'; }
-  window.showError   = (id, txt) => showMsg(document.getElementById(id), 'error', txt);
-  window.showSuccess = (id, txt) => showMsg(document.getElementById(id), 'success', txt);
-  window.hideMsg     = (id)      => hideMsg(document.getElementById(id));
 </script>
 
 </body>
