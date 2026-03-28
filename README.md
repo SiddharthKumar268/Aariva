@@ -476,7 +476,7 @@ Add in Render Environment tab: `MONGO_URI` · `SESSION_SECRET` · `GROQ_API_KEY`
 
 <div align="center">
 
-**Built with ❤️= by [Siddharth Kumar](https://siddharthkumar.tech)**
+**Developed by [Siddharth Kumar](https://siddharthkumar.tech)**
 
 *VIT Vellore · Full Stack Developer · MERN Stack*
 
