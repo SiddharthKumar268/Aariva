@@ -6,8 +6,6 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
 // ── POST /api/auth/login ──────────────────────
-// Step 1: Validate email + password
-// Returns user role + name (no session yet — OTP must be verified first)
 
 exports.login = async (req, res) => {
   try {
@@ -19,17 +17,22 @@ exports.login = async (req, res) => {
 
     const user = await User.findOne({ email: email.toLowerCase() });
 
+    // ✅ FIX: distinct message when user does not exist
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
+      return res.status(401).json({
+        message: 'No account found with this email. Please register first.'
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
+    // ✅ FIX: distinct message when password is wrong
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password.' });
+      return res.status(401).json({
+        message: 'Incorrect password. Please try again.'
+      });
     }
 
-    // Store pending login in session (not fully logged in yet — awaiting OTP)
     req.session.pendingUserId = user._id.toString();
     req.session.pendingEmail  = user.email;
 
@@ -46,8 +49,6 @@ exports.login = async (req, res) => {
 };
 
 // ── POST /api/auth/verify-otp ─────────────────
-// Step 2: OTP was verified client-side via EmailJS
-// Finalize the session here
 
 exports.verifyOTP = async (req, res) => {
   try {
@@ -57,7 +58,6 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ message: 'OTP verification failed.' });
     }
 
-    // Confirm session matches
     if (!req.session.pendingUserId || req.session.pendingEmail !== email) {
       return res.status(401).json({ message: 'Session mismatch. Please login again.' });
     }
@@ -68,12 +68,10 @@ exports.verifyOTP = async (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    // Promote session to fully authenticated
     req.session.userId   = user._id.toString();
     req.session.userRole = user.role;
     req.session.userName = user.name;
 
-    // Clear pending state
     delete req.session.pendingUserId;
     delete req.session.pendingEmail;
 
@@ -97,10 +95,10 @@ exports.getMe = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
     res.json({
-      id:   user._id,
-      name: user.name,
+      id:    user._id,
+      name:  user.name,
       email: user.email,
-      role: user.role
+      role:  user.role
     });
   } catch (err) {
     console.error('getMe error:', err);
@@ -115,7 +113,6 @@ exports.getNotifications = async (req, res) => {
     const user = await User.findById(req.session.userId).select('notifications');
     if (!user) return res.status(404).json({ message: 'User not found.' });
 
-    // Return latest 20 notifications, newest first
     const notifications = (user.notifications || [])
       .slice()
       .reverse()
@@ -172,11 +169,10 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Invalid role.' });
     }
 
-    const user = await User.create({
+    await User.create({
       name,
       email: email.toLowerCase(),
-      // Let the User model pre-save hook hash the password once.
-      password,
+      password, // pre-save hook in User.js hashes this
       role
     });
 
