@@ -4,11 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aariva — Login</title>
+  <meta name="description" content="Aariva Disability Management System — Secure Login Portal">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="../assets/css/login.css" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+<!-- Floating Orbs (decorative) -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<!-- Grid Overlay -->
+<div class="grid-overlay"></div>
+
+<!-- Particle Canvas -->
+<canvas id="particles-canvas"></canvas>
 
 <div class="login-wrapper">
 
@@ -27,6 +40,8 @@
 
   <!-- Card -->
   <div class="card">
+    <!-- Noise texture overlay -->
+    <div class="card-noise"></div>
 
     <!-- Steps indicator -->
     <div class="steps-indicator" id="steps-indicator">
@@ -77,14 +92,15 @@
             display: none;
             margin-top: 14px;
             padding: 11px 15px;
-            border-radius: 8px;
+            border-radius: 12px;
             background: rgba(200, 169, 110, 0.08);
             border: 1px solid rgba(200, 169, 110, 0.3);
             color: #c8a96e;
             font-size: 13.5px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             line-height: 1.5;
             letter-spacing: 0.01em;
+            backdrop-filter: blur(10px);
           "
         ></div>
       </form>
@@ -127,39 +143,41 @@
 
         <button type="submit" class="btn-primary" id="otp-btn" style="margin-top:16px;">Verify &amp; Login</button>
 
-        <!-- OTP error box — gold themed -->
+        <!-- OTP error box -->
         <div
           id="otp-error"
           style="
             display: none;
             margin-top: 12px;
             padding: 11px 15px;
-            border-radius: 8px;
+            border-radius: 12px;
             background: rgba(200, 169, 110, 0.08);
             border: 1px solid rgba(200, 169, 110, 0.3);
             color: #c8a96e;
             font-size: 13.5px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             line-height: 1.5;
             letter-spacing: 0.01em;
+            backdrop-filter: blur(10px);
           "
         ></div>
 
-        <!-- OTP success box — muted green to complement gold -->
+        <!-- OTP success box -->
         <div
           id="otp-success"
           style="
             display: none;
             margin-top: 12px;
             padding: 11px 15px;
-            border-radius: 8px;
+            border-radius: 12px;
             background: rgba(100, 180, 130, 0.08);
             border: 1px solid rgba(100, 180, 130, 0.25);
             color: #7ec8a0;
             font-size: 13.5px;
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             line-height: 1.5;
             letter-spacing: 0.01em;
+            backdrop-filter: blur(10px);
           "
         ></div>
       </form>
@@ -174,13 +192,110 @@
 </div><!-- /wrapper -->
 
 <!-- FOOTER -->
-<footer style="width:100%;background:#0e0f14;border-top:1px solid #1e2029;padding:18px 24px;font-family:'DM Sans','Segoe UI',sans-serif;font-size:13px;color:#4b5068;box-sizing:border-box;">
+<footer style="width:100%;background:rgba(6,12,9,0.9);border-top:1px solid rgba(212,175,55,0.06);padding:20px 24px;font-family:'Inter','Segoe UI',sans-serif;font-size:13px;color:#4a6054;box-sizing:border-box;backdrop-filter:blur(20px);position:relative;z-index:10;">
   <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
     <span>© 2025 Aariva</span>
-    <span style="color:#2a2d3a;">·</span>
-    <span>Built with <span style="color:#4f8ef7;">♥</span> by <strong style="color:#a0aec0;font-weight:600;">Siddharth Kumar</strong></span>
+    <span style="color:rgba(212,175,55,0.2);">·</span>
+    <span>Built with <span style="color:#d4af37;">♥</span> by <strong style="color:#8fa898;font-weight:600;">Siddharth Kumar</strong></span>
   </div>
 </footer>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--         PARTICLE SYSTEM (Fireflies)        -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+(function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w, h;
+  let particles = [];
+  const PARTICLE_COUNT = 60;
+
+  function resize() {
+    w = canvas.width  = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x  = Math.random() * w;
+      this.y  = Math.random() * h;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = (Math.random() - 0.5) * 0.3;
+      this.r  = Math.random() * 2 + 0.5;
+      this.life = Math.random() * 400 + 100;
+      this.maxLife = this.life;
+      // Mix of gold and emerald
+      const isGold = Math.random() > 0.4;
+      this.color = isGold
+        ? `rgba(212,175,55,${(Math.random() * 0.4 + 0.15).toFixed(2)})`
+        : `rgba(61,189,122,${(Math.random() * 0.3 + 0.1).toFixed(2)})`;
+      this.glowColor = isGold
+        ? 'rgba(212,175,55,0.15)'
+        : 'rgba(61,189,122,0.1)';
+    }
+    update() {
+      this.x += this.vx + Math.sin(this.life * 0.02) * 0.15;
+      this.y += this.vy + Math.cos(this.life * 0.015) * 0.1;
+      this.life--;
+      if (this.life <= 0 || this.x < -10 || this.x > w + 10 || this.y < -10 || this.y > h + 10) {
+        this.reset();
+      }
+    }
+    draw() {
+      const alpha = Math.min(1, this.life / this.maxLife, (this.maxLife - this.life) / 50);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      // Glow
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r * 4, 0, Math.PI * 2);
+      ctx.fillStyle = this.glowColor;
+      ctx.fill();
+      // Core
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function init() {
+    resize();
+    particles = [];
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, w, h);
+    particles.forEach(p => { p.update(); p.draw(); });
+
+    // Draw subtle connections between nearby particles
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(212,175,55,${(0.04 * (1 - dist/120)).toFixed(3)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  init();
+  loop();
+  window.addEventListener('resize', () => { resize(); });
+})();
+</script>
 
 <!-- EmailJS SDK -->
 <script src="https://unpkg.com/@emailjs/browser@4/dist/email.min.js"></script>
@@ -294,6 +409,26 @@
         hidden.value = code;
       }, true);
     }
+  })();
+
+  // ── Subtle mouse parallax on card ──
+  (function initParallax() {
+    const card = document.querySelector('.card');
+    const wrapper = document.querySelector('.login-wrapper');
+    if (!card || !wrapper) return;
+
+    wrapper.addEventListener('mousemove', (e) => {
+      const rect = wrapper.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `perspective(1200px) rotateY(${x * 2}deg) rotateX(${-y * 2}deg)`;
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1200px) rotateY(0deg) rotateX(0deg)';
+      card.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+      setTimeout(() => { card.style.transition = ''; }, 600);
+    });
   })();
 </script>
 
