@@ -1,0 +1,239 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.hero { padding: 28px 24px 16px; border-bottom: 1px solid var(--color-border-tertiary); }
+.hero h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.hero p { font-size: 14px; color: var(--color-text-secondary); margin-top: 4px; }
+.tabs { display: flex; gap: 6px; padding: 16px 24px 0; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid var(--color-border-tertiary); color: var(--color-text-secondary); background: transparent; transition: all .15s; }
+.tab.active { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; padding: 18px 24px 24px; }
+.card { border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 18px; background: var(--color-background-secondary); transition: border-color .15s; }
+.card:hover { border-color: var(--color-border-primary); }
+.card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+.icon.purple { background: #EEEDFE; }
+.icon.teal   { background: #E1F5EE; }
+.icon.coral  { background: #FAECE7; }
+.icon.amber  { background: #FAEEDA; }
+.icon.blue   { background: #E6F1FB; }
+.icon.green  { background: #EAF3DE; }
+@media (prefers-color-scheme: dark) {
+  .icon.purple { background: #26215C; }
+  .icon.teal   { background: #04342C; }
+  .icon.coral  { background: #4A1B0C; }
+  .icon.amber  { background: #412402; }
+  .icon.blue   { background: #042C53; }
+  .icon.green  { background: #173404; }
+}
+.card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.card-role { font-size: 11px; color: var(--color-text-tertiary); margin-top: 1px; }
+.card-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+.badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-top: 10px; font-weight: 500; }
+.badge.applicant { background: #E6F1FB; color: #185FA5; }
+.badge.caseworker { background: #E1F5EE; color: #0F6E56; }
+.badge.doctor    { background: #EEEDFE; color: #534AB7; }
+.badge.admin     { background: #FAECE7; color: #993C1D; }
+.badge.all       { background: #F1EFE8; color: #5F5E5A; }
+@media (prefers-color-scheme: dark) {
+  .badge.applicant  { background: #042C53; color: #85B7EB; }
+  .badge.caseworker { background: #04342C; color: #5DCAA5; }
+  .badge.doctor     { background: #26215C; color: #AFA9EC; }
+  .badge.admin      { background: #4A1B0C; color: #F0997B; }
+  .badge.all        { background: #2C2C2A; color: #B4B2A9; }
+}
+.hidden { display: none; }
+.run-box { margin: 0 24px 24px; padding: 16px 18px; border-radius: var(--border-radius-lg); border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); }
+.run-box h2 { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 12px; }
+.steps { display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; gap: 12px; align-items: flex-start; }
+.step-num { width: 24px; height: 24px; border-radius: 50%; background: #EEEDFE; color: #534AB7; font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+@media (prefers-color-scheme: dark) { .step-num { background: #26215C; color: #AFA9EC; } }
+.step-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; padding-top: 2px; }
+.step-text code { font-family: var(--font-mono); font-size: 12px; background: var(--color-background-primary); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+</style>
+
+<div class="hero">
+  <h1>Aariva — feature guide</h1>
+  <p>Disability management system · 4 roles · 15 features</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="filter('all')">All features</button>
+  <button class="tab" onclick="filter('applicant')">Applicant</button>
+  <button class="tab" onclick="filter('caseworker')">Case worker</button>
+  <button class="tab" onclick="filter('doctor')">Doctor</button>
+  <button class="tab" onclick="filter('admin')">Admin</button>
+  <button class="tab" onclick="filter('run')">How to run</button>
+</div>
+
+<div class="grid" id="grid">
+
+  <div class="card" data-role="all">
+    <div class="card-top">
+      <div class="icon purple">🔐</div>
+      <div><div class="card-title">Register &amp; login</div><div class="card-role">All roles</div></div>
+    </div>
+    <div class="card-desc">Create an account and log in. Each user is assigned a role — Applicant, Case Worker, Doctor, or Admin — which controls what they can see and do.</div>
+    <span class="badge all">All roles</span>
+  </div>
+
+  <div class="card" data-role="all">
+    <div class="card-top">
+      <div class="icon blue">🗂️</div>
+      <div><div class="card-title">Role-based dashboards</div><div class="card-role">All roles</div></div>
+    </div>
+    <div class="card-desc">Each role gets its own dashboard view. Applicants see their case status. Case workers see pending submissions. Doctors see cases awaiting evaluation. Admins see everything.</div>
+    <span class="badge all">All roles</span>
+  </div>
+
+  <div class="card" data-role="all">
+    <div class="card-top">
+      <div class="icon teal">🔔</div>
+      <div><div class="card-title">Notifications panel</div><div class="card-role">All roles</div></div>
+    </div>
+    <div class="card-desc">Every user gets real-time status update alerts on their dashboard whenever their case moves forward — submitted, under review, approved, rejected, or flagged.</div>
+    <span class="badge all">All roles</span>
+  </div>
+
+  <div class="card" data-role="applicant">
+    <div class="card-top">
+      <div class="icon blue">📍</div>
+      <div><div class="card-title">Case status tracking</div><div class="card-role">Applicant</div></div>
+    </div>
+    <div class="card-desc">Track your disability case in real time through every stage: Pending → Under Review → Approved / Rejected. See exactly where your case is without calling anyone.</div>
+    <span class="badge applicant">Applicant</span>
+  </div>
+
+  <div class="card" data-role="caseworker">
+    <div class="card-top">
+      <div class="icon teal">📝</div>
+      <div><div class="card-title">Case submission</div><div class="card-role">Case worker</div></div>
+    </div>
+    <div class="card-desc">Submit a new disability case on behalf of an applicant. Fill in personal details, disability information, and supporting context through a validated form.</div>
+    <span class="badge caseworker">Case worker</span>
+  </div>
+
+  <div class="card" data-role="caseworker">
+    <div class="card-top">
+      <div class="icon amber">📎</div>
+      <div><div class="card-title">Document upload</div><div class="card-role">Case worker</div></div>
+    </div>
+    <div class="card-desc">Attach medical documents (PDFs or images) directly to a case. Files are stored securely and linked to the case record for doctors and admins to review.</div>
+    <span class="badge caseworker">Case worker</span>
+  </div>
+
+  <div class="card" data-role="caseworker">
+    <div class="card-top">
+      <div class="icon green">✅</div>
+      <div><div class="card-title">Form validation</div><div class="card-role">Case worker</div></div>
+    </div>
+    <div class="card-desc">Both client-side and server-side validation catch errors before submission — missing fields, invalid file types, or incomplete data — with clear error messages.</div>
+    <span class="badge caseworker">Case worker</span>
+  </div>
+
+  <div class="card" data-role="doctor">
+    <div class="card-top">
+      <div class="icon purple">🩺</div>
+      <div><div class="card-title">Medical evaluation</div><div class="card-role">Doctor</div></div>
+    </div>
+    <div class="card-desc">Review assigned cases, add a diagnosis, write evaluation notes, and upload a medical evaluation report. Your findings feed directly into the admin decision process.</div>
+    <span class="badge doctor">Doctor</span>
+  </div>
+
+  <div class="card" data-role="admin">
+    <div class="card-top">
+      <div class="icon coral">🏛️</div>
+      <div><div class="card-title">Admin review dashboard</div><div class="card-role">Admin</div></div>
+    </div>
+    <div class="card-desc">View all cases across the system. Filter by status (Pending, Under Review, Approved, Rejected). See full case history, uploaded documents, and medical evaluations in one place.</div>
+    <span class="badge admin">Admin</span>
+  </div>
+
+  <div class="card" data-role="admin">
+    <div class="card-top">
+      <div class="icon green">⚖️</div>
+      <div><div class="card-title">Approve / reject cases</div><div class="card-role">Admin</div></div>
+    </div>
+    <div class="card-desc">Make a final decision on any case — approve or reject — and write a written justification or remarks. The decision is logged and the applicant is notified instantly.</div>
+    <span class="badge admin">Admin</span>
+  </div>
+
+  <div class="card" data-role="admin">
+    <div class="card-top">
+      <div class="icon amber">❓</div>
+      <div><div class="card-title">Clarification requests</div><div class="card-role">Admin</div></div>
+    </div>
+    <div class="card-desc">Flag a case and request additional information before making a decision. The case worker is notified and can resubmit with updated details.</div>
+    <span class="badge admin">Admin</span>
+  </div>
+
+  <div class="card" data-role="admin">
+    <div class="card-top">
+      <div class="icon blue">📋</div>
+      <div><div class="card-title">Audit logs</div><div class="card-role">Admin</div></div>
+    </div>
+    <div class="card-desc">Every admin action and case status change is automatically recorded with a timestamp and user ID. Full traceability for compliance and accountability.</div>
+    <span class="badge admin">Admin</span>
+  </div>
+
+  <div class="card" data-role="admin">
+    <div class="card-top">
+      <div class="icon teal">🖨️</div>
+      <div><div class="card-title">Case summary report</div><div class="card-role">Admin</div></div>
+    </div>
+    <div class="card-desc">Generate a printable summary of a case's full lifecycle — submission details, medical evaluation, admin decisions, and all status changes in chronological order.</div>
+    <span class="badge admin">Admin</span>
+  </div>
+
+  <div class="card" data-role="admin">
+    <div class="card-top">
+      <div class="icon coral">⚠️</div>
+      <div><div class="card-title">Escalation for delays</div><div class="card-role">Admin</div></div>
+    </div>
+    <div class="card-desc">Cases that stay in Pending or Under Review beyond a set time threshold are automatically flagged for escalation, so nothing slips through the cracks.</div>
+    <span class="badge admin">Admin</span>
+  </div>
+
+  <div class="card" data-role="all">
+    <div class="card-top">
+      <div class="icon purple">🔒</div>
+      <div><div class="card-title">Session management</div><div class="card-role">All roles</div></div>
+    </div>
+    <div class="card-desc">Secure login sessions with automatic timeout after inactivity and a manual logout button. Prevents unauthorized access if a browser is left open.</div>
+    <span class="badge all">All roles</span>
+  </div>
+
+</div>
+
+<div class="run-box hidden" id="run-section">
+  <h2>How to run Aariva</h2>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-text">Open a terminal and start MongoDB: <code>mongod --dbpath "C:\data\db"</code> — keep this window open, wait for <em>"Waiting for connections"</em></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text">Open a second terminal, go to your project: <code>cd D:\Python\Avi.py\aariva</code></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text">Start the server: <code>npm start</code> — you should see <em>"Aariva running on http://localhost:5000"</em> and <em>"MongoDB connected"</em></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text">Open your browser and go to <code>http://localhost:5000</code></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text">Register an account and pick a role — start with <strong>Admin</strong> to see all features, or <strong>Case Worker</strong> to submit a test case</div></div>
+  </div>
+</div>
+
+<script>
+function filter(role) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  const grid = document.getElementById('grid');
+  const runBox = document.getElementById('run-section');
+  if (role === 'run') {
+    grid.classList.add('hidden');
+    runBox.classList.remove('hidden');
+    return;
+  }
+  grid.classList.remove('hidden');
+  runBox.classList.add('hidden');
+  document.querySelectorAll('.card').forEach(c => {
+    const r = c.dataset.role;
+    c.classList.toggle('hidden', role !== 'all' && r !== role && r !== 'all');
+  });
+}
+</script>

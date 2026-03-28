@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aariva — Dashboard</title>
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" /> 
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h2>Aariva</h2>
+      <span>Case Management</span>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="user-name" id="user-name">—</div>
+        <div class="user-role" id="user-role">—</div>
+      </div>
+      <button class="nav-link" onclick="logout()"><span class="icon">🚪</span> Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1 id="page-title">Dashboard</h1>
+        <p id="page-subtitle">Welcome to Aariva</p>
+      </div>
+      <div class="notif-wrapper">
+        <button id="notif-btn" class="btn btn-outline btn-sm">
+          🔔 Notifications <span id="notif-dot" class="notif-dot" style="display:none"></span>
+        </button>
+        <div id="notif-panel" style="display:none">
+          <div class="notif-header">
+            Notifications <span>Today</span>
+          </div>
+          <div id="notif-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="alert" class="alert"></div>
+    <div id="role-content"></div>
+  </main>
+</div>
+<footer style="width:100%;background:#0e0f14;border-top:1px solid #1e2029;padding:18px 24px;font-family:'DM Sans','Segoe UI',sans-serif;font-size:13px;color:#4b5068;box-sizing:border-box;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+    <span>© 2025 Aariva</span>
+    <span style="color:#2a2d3a;">·</span>
+    <span>Built with <span style="color:#4f8ef7;font-size:13px;">♥</span> by <strong style="color:#a0aec0;font-weight:600;">Siddharth Kumar</strong></span>
+  </div>
+</footer>
+<script src="/assets/js/utils.js"></script>
+<script src="/assets/js/dashboard.js"></script>
+<script src="/assets/js/chatbot.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+/* ═══════════════════════════════════════════════════════════
+   AARIVA · tokens.css — Design Tokens & Theme Foundation
+   Obsidian Glass · Deep navy core · Obsidian Teal accent
+   Dynamic lighting: dim the chrome, ignite the content
+═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
+/* ── Color Palette ───────────────────────────────────────── */
+:root {
+
+  /* Base surfaces — deep obsidian, layered */
+  --bg-void:       #080a0f;   /* deepest background — true black-blue */
+  --bg-base:       #0c0e16;   /* page background */
+  --bg-raised:     #111420;   /* sidebar, cards */
+  --bg-overlay:    #181c2b;   /* elevated cards, inputs */
+  --bg-float:      #1e2235;   /* tooltips, dropdowns, modals */
+  --bg-hover:      #242840;   /* hover states */
+
+  /* Borders — barely visible structure */
+  --border-dim:    rgba(255,255,255,0.04);
+  --border-soft:   rgba(255,255,255,0.08);
+  --border-mid:    rgba(255,255,255,0.12);
+  --border-strong: rgba(255,255,255,0.20);
+
+  /* Accent — Obsidian Teal, the ONE bright thing */
+  --accent:        #00a890;   /* primary teal */
+  --accent-bright: #00c8b0;   /* hover / highlight teal */
+  --accent-dim:    #007a6a;   /* pressed / deep teal */
+  --accent-glow:   rgba(0,168,144,0.35);
+  --accent-soft:   rgba(0,168,144,0.10);
+  --accent-pulse:  rgba(0,168,144,0.06);
+
+  /* Semantic colors */
+  --success:       #34d399;
+  --success-soft:  rgba(52,211,153,0.10);
+  --success-glow:  rgba(52,211,153,0.25);
+
+  --danger:        #f87171;
+  --danger-soft:   rgba(248,113,113,0.10);
+  --danger-glow:   rgba(248,113,113,0.25);
+
+  --warning:       #fbbf24;
+  --warning-soft:  rgba(251,191,36,0.10);
+  --warning-glow:  rgba(251,191,36,0.25);
+
+  --info:          #38bdf8;
+  --info-soft:     rgba(56,189,248,0.10);
+
+  --purple:        #a78bfa;
+  --purple-soft:   rgba(167,139,250,0.10);
+
+  /* Text — layered luminance */
+  --text-bright:   #f0f2ff;   /* headings, key data */
+  --text-base:     #c8ccde;   /* body copy */
+  --text-muted:    #7a80a0;   /* labels, secondary */
+  --text-faint:    #3d4260;   /* placeholders, disabled */
+  --text-ghost:    #252840;   /* barely visible hints */
+
+  /* Typography */
+  --font-display:  'Syne', sans-serif;
+  --font-body:     'DM Sans', sans-serif;
+
+  /* Spacing scale */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radius */
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
+  --radius-full: 9999px;
+
+  /* Shadows — layered depth */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-xl:  0 24px 64px rgba(0,0,0,0.7), 0 8px 24px rgba(0,0,0,0.4);
+
+  /* Glow shadows — accent light bleeding */
+  --glow-accent:  0 0 24px rgba(0,168,144,0.20), 0 0 8px rgba(0,168,144,0.12);
+  --glow-success: 0 0 24px rgba(52,211,153,0.20), 0 0 8px rgba(52,211,153,0.10);
+  --glow-danger:  0 0 24px rgba(248,113,113,0.20), 0 0 8px rgba(248,113,113,0.10);
+
+  /* Sidebar */
+  --sidebar-w: 248px;
+
+  /* Transitions */
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:   cubic-bezier(0.4, 0, 1, 1);
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); /* slight bounce */
+  --dur-fast:  120ms;
+  --dur-mid:   220ms;
+  --dur-slow:  380ms;
+}

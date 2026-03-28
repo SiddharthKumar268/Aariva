@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Track Case — Aariva</title>
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <span class="logo">Aariva</span>
+  <a href="/dashboard" class="back">← Dashboard</a>
+</div>
+
+<div class="page-container">
+
+  <!-- Search -->
+  <div class="search-card">
+    <h2>Track Your Disability Case</h2>
+    <div class="search-row">
+      <input type="text" id="caseIdInput" placeholder="Enter Case ID…"/>
+      <button onclick="loadCase()">Track</button>
+    </div>
+  </div>
+
+  <div class="loading-state hidden" id="loadingState">
+    <div class="spinner"></div> Loading case…
+  </div>
+
+  <!-- Results -->
+  <div class="hidden" id="results">
+
+    <!-- Status header -->
+    <div class="status-header" id="statusHeader"></div>
+
+    <!-- Escalation banner -->
+    <div class="escalation-banner hidden" id="escalationBanner">
+      <div class="esc-icon">⚑</div>
+      <div>
+        <h5>Case Escalated — Processing Delay Flagged</h5>
+        <p>This case has been pending for more than 7 days and has been automatically escalated to a supervisor for priority review.</p>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-card">
+      <h4>Case Progress Timeline</h4>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="notif-card" id="notifCard">
+      <h4>Status Notifications</h4>
+      <div id="notifList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const STAGES = [
+  { key: 'submitted',  label: 'Case Submitted',    icon: '📝' },
+  { key: 'review',     label: 'Under Review',       icon: '🔍' },
+  { key: 'evaluation', label: 'Medical Evaluation', icon: '🩺' },
+  { key: 'decision',   label: 'Admin Decision',     icon: '⚖️' },
+  { key: 'closed',     label: 'Case Closed',        icon: '✅' },
+];
+
+const STATUS_TO_STAGE = {
+  'Pending':                 0,
+  'Under Review':            1,
+  'Medical Evaluation':      2,
+  'Approved':                4,
+  'Rejected':                4,
+  'Clarification Requested': 1,
+  'Escalated':               1,
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (id) {
+    document.getElementById('caseIdInput').value = id;
+    loadCase();
+  }
+});
+
+async function loadCase() {
+  const id = document.getElementById('caseIdInput').value.trim();
+  if (!id) { alert('Please enter a Case ID'); return; }
+
+  document.getElementById('loadingState').classList.remove('hidden');
+  document.getElementById('results').classList.add('hidden');
+
+  try {
+    const res = await fetch(`/api/cases/${id}/track`);
+    if (!res.ok) {
+      alert('Case not found. Check the Case ID and try again.');
+      document.getElementById('loadingState').classList.add('hidden');
+      return;
+    }
+    const c = await res.json();
+    renderCase(c);
+  } catch {
+    alert('Network error. Please try again.');
+  }
+  document.getElementById('loadingState').classList.add('hidden');
+}
+
+function renderCase(c) {
+  const name = `${c.applicant?.firstName || ''} ${c.applicant?.lastName || ''}`.trim() || 'Unknown Applicant';
+  const date = c.submissionDate
+    ? new Date(c.submissionDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '—';
+
+  const statusClass = {
+    'Pending':                 'badge-pending',
+    'Under Review':            'badge-review',
+    'Approved':                'badge-approved',
+    'Rejected':                'badge-rejected',
+    'Clarification Requested': 'badge-clarify',
+    'Escalated':               'badge-escalated',
+  }[c.caseStatus] || 'badge-pending';
+
+  document.getElementById('statusHeader').innerHTML = `
+    <div class="sh-top">
+      <div>
+        <div class="sh-name">${name}</div>
+        <div class="sh-id">Case ID: ${c._id} · Submitted: ${date}</div>
+      </div>
+      <span class="badge ${statusClass}">${c.caseStatus}</span>
+    </div>
+    <div class="sh-grid">
+      <div><div class="sh-field-label">Disability Type</div><div class="sh-field-val">${c.disability?.disabilityType || c.disability?.type || '—'}</div></div>
+      <div><div class="sh-field-label">Severity</div><div class="sh-field-val">${c.disability?.severity || '—'}</div></div>
+    </div>`;
+
+  if (c.escalated) {
+    document.getElementById('escalationBanner').classList.remove('hidden');
+  }
+
+  const stageIdx = STATUS_TO_STAGE[c.caseStatus] ?? 0;
+  document.getElementById('timeline').innerHTML = STAGES.map((s, i) => {
+    let state = i < stageIdx ? 'done' : i === stageIdx ? 'active' : 'pending';
+    let noteHtml = '';
+    if (i === stageIdx && c.caseStatus === 'Clarification Requested') {
+      noteHtml = `<div class="tl-note">⚠ Clarification requested — check your notifications</div>`;
+    }
+    if (i === 4 && c.caseStatus === 'Approved') {
+      noteHtml = `<div class="tl-note text-success">✓ Case approved successfully</div>`;
+    }
+    if (i === 4 && c.caseStatus === 'Rejected') {
+      noteHtml = `<div class="tl-note text-danger">✗ Case was not approved</div>`;
+    }
+    return `
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot ${state}">${state === 'done' ? '✓' : s.icon}</div>
+          <div class="tl-connector ${state === 'done' ? 'done' : ''}"></div>
+        </div>
+        <div class="tl-content">
+          <div class="tl-stage ${state}">${s.label}</div>
+          ${i === 0 ? `<div class="tl-date">${date}</div>` : ''}
+          ${noteHtml}
+        </div>
+      </div>`;
+  }).join('');
+
+  const notifs = c.notifications || [];
+  document.getElementById('notifList').innerHTML = notifs.length
+    ? notifs.map(n => `
+        <div class="track-notif-item">
+          <div class="track-notif-dot ${n.type || 'info'}"></div>
+          <div>
+            <div class="track-notif-text">${n.message}</div>
+            <div class="track-notif-time">${n.createdAt ? new Date(n.createdAt).toLocaleString() : '—'}</div>
+          </div>
+        </div>`).join('')
+    : '<div class="no-notif">No notifications yet for this case.</div>';
+
+  document.getElementById('results').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

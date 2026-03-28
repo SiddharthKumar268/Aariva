@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Medical Evaluation — Aariva</title>
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" />
+   <link rel="stylesheet" href="../assets/css/evaluation-theme.css">
+<!-- <style>
+  :root{
+    --blue:#2563eb;--blue-light:#eff6ff;--green:#16a34a;--green-light:#f0fdf4;
+    --red:#dc2626;--yellow:#d97706;--purple:#7c3aed;--gray:#6b7280;
+    --border:#e5e7eb;--bg:#f9fafb;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:#111827;min-height:100vh;}
+
+  /* Topbar */
+  .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .logo{font-weight:700;font-size:1.2rem;color:var(--blue);}
+  .topbar-right{display:flex;align-items:center;gap:.75rem;}
+  .btn{padding:.5rem 1.1rem;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;transition:all .15s;}
+  .btn-outline{background:#fff;border:1.5px solid var(--border);color:#374151;}
+  .btn-outline:hover{border-color:#9ca3af;}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-primary:hover{background:#1d4ed8;}
+  .btn-success{background:var(--green);color:#fff;}
+  .btn-success:hover{background:#15803d;}
+  .btn-sm{padding:.35rem .8rem;font-size:.8rem;}
+
+  /* Layout */
+  .layout{display:grid;grid-template-columns:340px 1fr;gap:1.5rem;max-width:1200px;margin:2rem auto;padding:0 1.5rem;}
+
+  /* Queue panel */
+  .queue-panel{}
+  .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+  .panel-title{font-size:.95rem;font-weight:700;color:#111827;}
+  .panel-count{font-size:.78rem;color:var(--gray);background:#f3f4f6;padding:.2rem .6rem;border-radius:20px;}
+
+  .queue-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;margin-bottom:.65rem;transition:all .15s;position:relative;}
+  .queue-card:hover{border-color:#93c5fd;box-shadow:0 0 0 3px #eff6ff;}
+  .queue-card.active{border-color:var(--blue);box-shadow:0 0 0 3px #eff6ff;}
+  .queue-card.completed{opacity:.55;}
+  .qc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;}
+  .qc-name{font-size:.9rem;font-weight:600;color:#111827;}
+  .qc-id{font-size:.72rem;color:var(--gray);margin-top:.15rem;font-family:monospace;}
+  .qc-meta{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+  .qc-tag{font-size:.72rem;padding:.15rem .5rem;border-radius:6px;font-weight:500;}
+  .tag-severity-low{background:#f0fdf4;color:#166534;}
+  .tag-severity-moderate{background:#fef3c7;color:#92400e;}
+  .tag-severity-high{background:#fef2f2;color:#991b1b;}
+  .tag-severity-severe{background:#fdf4ff;color:#6b21a8;}
+  .tag-type{background:#eff6ff;color:#1e40af;}
+  .tag-specialist{background:#fdf4ff;color:#7c3aed;}
+  .tag-done{background:#f0fdf4;color:#166534;}
+  .qc-date{font-size:.72rem;color:var(--gray);margin-top:.5rem;}
+
+  .queue-empty{text-align:center;padding:3rem 1rem;color:var(--gray);}
+  .queue-empty .icon{font-size:2.5rem;margin-bottom:.75rem;}
+  .queue-empty p{font-size:.875rem;}
+
+  /* Detail panel */
+  .detail-panel{}
+  .detail-empty{background:#fff;border:1px solid var(--border);border-radius:14px;padding:4rem 2rem;text-align:center;color:var(--gray);}
+  .detail-empty .icon{font-size:3rem;margin-bottom:1rem;}
+  .detail-empty p{font-size:.9rem;}
+
+  /* Case detail card */
+  .case-detail{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1rem;}
+  .cd-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);}
+  .cd-name{font-size:1.1rem;font-weight:700;}
+  .cd-id{font-size:.75rem;color:var(--gray);margin-top:.2rem;font-family:monospace;}
+  .badge{padding:.25rem .7rem;border-radius:20px;font-size:.78rem;font-weight:700;}
+  .badge-pending{background:#fef3c7;color:#92400e;}
+  .badge-review{background:#dbeafe;color:#1e40af;}
+  .badge-escalated{background:#fdf4ff;color:#86198f;}
+
+  .cd-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem 1.5rem;}
+  .cd-field label{font-size:.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:.2rem;}
+  .cd-field span{font-size:.875rem;font-weight:500;color:#111827;}
+
+  .cd-desc{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);}
+  .cd-desc label{font-size:.72rem;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:.4rem;}
+  .cd-desc p{font-size:.875rem;color:#374151;line-height:1.6;}
+
+  /* Eval already done banner */
+  .eval-done-banner{background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem;}
+  .eval-done-banner .icon{font-size:1.4rem;}
+  .eval-done-banner h5{font-size:.875rem;font-weight:700;color:#166534;}
+  .eval-done-banner p{font-size:.8rem;color:#15803d;margin-top:.15rem;}
+
+  /* Evaluation form */
+  .eval-form-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.5rem;}
+  .eval-form-card h3{font-size:.95rem;font-weight:700;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border);}
+
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .form-group{margin-bottom:1rem;}
+  .form-group.full{grid-column:1/-1;}
+  .form-group label{font-size:.78rem;font-weight:600;color:#374151;display:block;margin-bottom:.4rem;}
+  .form-group label .req{color:var(--red);}
+  .form-group input,
+  .form-group select,
+  .form-group textarea{width:100%;padding:.55rem .8rem;border:1.5px solid var(--border);border-radius:8px;font-size:.875rem;font-family:inherit;color:#111827;background:#fff;outline:none;transition:border-color .15s;}
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus{border-color:var(--blue);}
+  .form-group textarea{resize:vertical;min-height:90px;}
+  .form-group .hint{font-size:.72rem;color:var(--gray);margin-top:.3rem;}
+
+  .char-count{font-size:.72rem;color:var(--gray);text-align:right;margin-top:.2rem;}
+  .char-count.warn{color:var(--yellow);}
+  .char-count.ok{color:var(--green);}
+
+  .pct-row{display:flex;align-items:center;gap:.75rem;}
+  .pct-row input[type=range]{flex:1;accent-color:var(--blue);}
+  .pct-val{font-size:.875rem;font-weight:700;color:var(--blue);min-width:38px;text-align:right;}
+
+  .treatment-section{margin-top:.5rem;padding-top:1rem;border-top:1px dashed var(--border);}
+  .treatment-section h4{font-size:.82rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;}
+
+  .toggle-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem;}
+  .toggle-row label{font-size:.875rem;color:#374151;cursor:pointer;}
+  input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue);cursor:pointer;}
+
+  .form-actions{display:flex;justify-content:flex-end;gap:.75rem;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);}
+
+  .alert{padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem;display:none;}
+  .alert.show{display:block;}
+  .alert-error{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;}
+  .alert-success{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .hidden{display:none!important;}
+
+  .loading-queue{text-align:center;padding:2rem;color:var(--gray);font-size:.875rem;}
+
+  /* Escalation indicator */
+  .escalated-indicator{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;color:#7c3aed;font-weight:600;background:#fdf4ff;padding:.2rem .5rem;border-radius:6px;}
+
+  @media(max-width:768px){
+    .layout{grid-template-columns:1fr;}
+    .form-grid{grid-template-columns:1fr;}
+    .cd-grid{grid-template-columns:1fr;}
+  }
+</style> -->
+</head>
+<body>
+
+<div class="topbar">
+  <span class="logo">Aariva</span>
+  <div class="topbar-right">
+    <span id="doctorName" style="font-size:.85rem;color:var(--gray);"></span>
+    <a href="/dashboard" class="btn btn-outline btn-sm">← Dashboard</a>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- Left: Case Queue -->
+  <div class="queue-panel">
+    <div class="panel-header">
+      <span class="panel-title">🩺 Evaluation Queue</span>
+      <span class="panel-count" id="queueCount">Loading…</span>
+    </div>
+
+    <div id="queueLoading" class="loading-queue">
+      <div style="display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;"></div>
+      <span style="margin-left:.5rem;">Loading cases…</span>
+    </div>
+
+    <div id="queueList"></div>
+  </div>
+
+  <!-- Right: Detail + Eval Form -->
+  <div class="detail-panel">
+
+    <div class="detail-empty" id="detailEmpty">
+      <div class="icon">👈</div>
+      <p>Select a case from the queue to begin evaluation</p>
+    </div>
+
+    <div class="hidden" id="detailContent">
+
+      <!-- Alert -->
+      <div class="alert alert-error" id="formAlert"></div>
+      <div class="alert alert-success" id="formSuccess"></div>
+
+      <!-- Case details -->
+      <div class="case-detail" id="caseDetail"></div>
+
+      <!-- Already evaluated banner -->
+      <div class="eval-done-banner hidden" id="evalDoneBanner">
+        <div class="icon">✅</div>
+        <div>
+          <h5>Evaluation Already Submitted</h5>
+          <p>A medical evaluation has been recorded for this case.</p>
+        </div>
+      </div>
+
+      <!-- Evaluation form -->
+      <div class="eval-form-card" id="evalFormCard">
+        <h3>📋 Submit Medical Evaluation</h3>
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Evaluation Type <span class="req">*</span></label>
+            <select id="evalType">
+              <option value="">— Select —</option>
+              <option value="Initial Assessment">Initial Assessment</option>
+              <option value="Specialist Review">Specialist Review</option>
+              <option value="Follow-up Evaluation">Follow-up Evaluation</option>
+              <option value="Reassessment">Reassessment</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Evaluation Date <span class="req">*</span></label>
+            <input type="date" id="evalDate"/>
+          </div>
+
+          <div class="form-group full">
+            <label>Diagnosis <span class="req">*</span> <span style="font-weight:400;color:var(--gray)">(min 30 characters)</span></label>
+            <textarea id="diagnosis" placeholder="Provide a detailed clinical diagnosis…" oninput="updateCharCount()"></textarea>
+            <div class="char-count" id="diagCharCount">0 / 30 minimum</div>
+          </div>
+
+          <div class="form-group full">
+            <label>Disability Percentage <span class="req">*</span></label>
+            <div class="pct-row">
+              <input type="range" id="disabilityPct" min="0" max="100" value="0" oninput="document.getElementById('pctVal').textContent=this.value+'%'"/>
+              <span class="pct-val" id="pctVal">0%</span>
+            </div>
+            <div class="hint">Drag to set the estimated disability percentage (0–100%)</div>
+          </div>
+
+          <div class="form-group full">
+            <label>Prognosis <span class="req">*</span></label>
+            <select id="prognosis">
+              <option value="">— Select prognosis —</option>
+              <option value="Full Recovery Expected">Full Recovery Expected</option>
+              <option value="Partial Recovery Expected">Partial Recovery Expected</option>
+              <option value="Stable — No Change Expected">Stable — No Change Expected</option>
+              <option value="Progressive Condition">Progressive Condition</option>
+              <option value="Terminal Condition">Terminal Condition</option>
+            </select>
+          </div>
+
+          <!-- Treatment section -->
+          <div class="form-group full treatment-section">
+            <h4>Treatment & Referral (Optional)</h4>
+
+            <div class="toggle-row">
+              <input type="checkbox" id="hasTreatment" onchange="toggleTreatment()"/>
+              <label for="hasTreatment">Include treatment recommendation</label>
+            </div>
+
+            <div class="hidden" id="treatmentFields">
+              <div class="form-group">
+                <label>Treatment Plan</label>
+                <textarea id="treatmentPlan" placeholder="Describe recommended treatment…"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Estimated Duration</label>
+                <input type="text" id="treatmentDuration" placeholder="e.g. 6 months, Ongoing"/>
+              </div>
+            </div>
+
+            <div class="toggle-row" style="margin-top:.5rem;">
+              <input type="checkbox" id="specialistRefer"/>
+              <label for="specialistRefer">Refer to specialist</label>
+            </div>
+
+            <div class="hidden" id="specialistField">
+              <div class="form-group">
+                <label>Specialist / Department</label>
+                <input type="text" id="referSpecialist" placeholder="e.g. Neurology, Orthopaedics"/>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-outline" onclick="clearForm()">Clear</button>
+          <button class="btn btn-success" id="submitBtn" onclick="submitEvaluation()">
+            Submit Evaluation
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── State ──
+  let selectedCaseId = null;
+  let cases = [];
+
+  // ── Init ──
+  window.addEventListener('DOMContentLoaded', async () => {
+    await checkAuth();
+    await loadQueue();
+    document.getElementById('evalDate').value = new Date().toISOString().split('T')[0];
+
+    // Specialist checkbox toggle
+    document.getElementById('specialistRefer').addEventListener('change', function() {
+      document.getElementById('specialistField').classList.toggle('hidden', !this.checked);
+    });
+  });
+
+  async function checkAuth() {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (!res.ok) { window.location.href = '/login'; return; }
+      const user = await res.json();
+      if (user.role !== 'doctor') { window.location.href = '/dashboard'; return; }
+      document.getElementById('doctorName').textContent = `Dr. ${user.name}`;
+    } catch {
+      window.location.href = '/login';
+    }
+  }
+
+  // ── Load queue ──
+  async function loadQueue() {
+    try {
+      const res = await fetch('/api/evaluation/queue');
+      if (!res.ok) throw new Error('Failed to load queue');
+      cases = await res.json();
+      renderQueue(cases);
+    } catch (err) {
+      document.getElementById('queueLoading').innerHTML =
+        `<span style="color:var(--red)">Failed to load cases. <a href="" onclick="location.reload();return false;">Retry</a></span>`;
+    }
+  }
+
+  function renderQueue(list) {
+    document.getElementById('queueLoading').classList.add('hidden');
+    const pending = list.filter(c => c.evalStatus !== 'completed');
+    const done    = list.filter(c => c.evalStatus === 'completed');
+    const sorted  = [...pending, ...done];
+
+    document.getElementById('queueCount').textContent =
+      `${pending.length} pending · ${done.length} done`;
+
+    if (!sorted.length) {
+      document.getElementById('queueList').innerHTML = `
+        <div class="queue-empty">
+          <div class="icon">🎉</div>
+          <p>No cases pending evaluation</p>
+        </div>`;
+      return;
+    }
+
+    document.getElementById('queueList').innerHTML = sorted.map(c => {
+      const name = `${c.applicant?.firstName || ''} ${c.applicant?.lastName || ''}`.trim() || 'Unknown';
+      const severity = c.disability?.severity || '';
+      const type     = c.disability?.disabilityType || c.disability?.type || '—';
+      const date     = c.submissionDate
+        ? new Date(c.submissionDate).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})
+        : '—';
+      const done = c.evalStatus === 'completed';
+      const escalated = c.escalated || c.specialistRequired;
+
+      return `
+        <div class="queue-card ${done ? 'completed' : ''}" onclick="selectCase('${c._id}')">
+          <div class="qc-top">
+            <div>
+              <div class="qc-name">${name}</div>
+              <div class="qc-id">${c._id}</div>
+            </div>
+            ${done ? '<span class="qc-tag tag-done">✓ Done</span>' : ''}
+          </div>
+          <div class="qc-meta">
+            <span class="qc-tag tag-type">${type}</span>
+            ${severity ? `<span class="qc-tag tag-severity-${severity.toLowerCase()}">${severity}</span>` : ''}
+            ${escalated ? '<span class="qc-tag tag-specialist">⚑ Escalated</span>' : ''}
+          </div>
+          <div class="qc-date">Submitted: ${date}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Select case ──
+  async function selectCase(id) {
+    selectedCaseId = id;
+
+    // Highlight active
+    document.querySelectorAll('.queue-card').forEach(el => el.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+
+    document.getElementById('detailEmpty').classList.add('hidden');
+    document.getElementById('detailContent').classList.remove('hidden');
+    document.getElementById('formAlert').classList.remove('show');
+    document.getElementById('formSuccess').classList.remove('show');
+
+    try {
+      const res = await fetch(`/api/cases/${id}`);
+      if (!res.ok) throw new Error();
+      const c = await res.json();
+      renderCaseDetail(c);
+    } catch {
+      document.getElementById('caseDetail').innerHTML =
+        '<p style="color:var(--red);padding:1rem">Failed to load case details.</p>';
+    }
+  }
+
+  function renderCaseDetail(c) {
+    const name = `${c.applicant?.firstName || ''} ${c.applicant?.lastName || ''}`.trim() || 'Unknown';
+    const date = c.submissionDate
+      ? new Date(c.submissionDate).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'})
+      : '—';
+    const statusClass = { 'Pending':'badge-pending','Under Review':'badge-review','Escalated':'badge-escalated' }[c.caseStatus] || 'badge-pending';
+    const disabilityType = c.disability?.disabilityType || c.disability?.type || '—';
+
+    document.getElementById('caseDetail').innerHTML = `
+      <div class="cd-header">
+        <div>
+          <div class="cd-name">${name}</div>
+          <div class="cd-id">ID: ${c._id}</div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+          ${c.escalated ? '<span class="escalated-indicator">⚑ Escalated</span>' : ''}
+          <span class="badge ${statusClass}">${c.caseStatus}</span>
+        </div>
+      </div>
+      <div class="cd-grid">
+        <div class="cd-field"><label>Full Name</label><span>${name}</span></div>
+        <div class="cd-field"><label>Date of Birth</label><span>${c.applicant?.dob || '—'}</span></div>
+        <div class="cd-field"><label>Gender</label><span>${c.applicant?.gender || '—'}</span></div>
+        <div class="cd-field"><label>Email</label><span>${c.applicant?.email || '—'}</span></div>
+        <div class="cd-field"><label>Phone</label><span>${c.applicant?.phone || '—'}</span></div>
+        <div class="cd-field"><label>Submitted</label><span>${date}</span></div>
+        <div class="cd-field"><label>Disability Type</label><span>${disabilityType}</span></div>
+        <div class="cd-field"><label>Severity</label><span>${c.disability?.severity || '—'}</span></div>
+        <div class="cd-field"><label>Onset Date</label><span>${c.disability?.onsetDate || '—'}</span></div>
+        <div class="cd-field"><label>Affected Areas</label><span>${c.disability?.affectedAreas || '—'}</span></div>
+      </div>
+      ${c.disability?.description ? `
+        <div class="cd-desc">
+          <label>Description</label>
+          <p>${c.disability.description}</p>
+        </div>` : ''}
+      ${c.disability?.treatment ? `
+        <div class="cd-desc">
+          <label>Current Treatment</label>
+          <p>${c.disability.treatment}</p>
+        </div>` : ''}`;
+
+    // Check if already evaluated
+    const caseData = cases.find(x => x._id === c._id?.toString() || x._id?.toString() === c._id?.toString());
+    const alreadyDone = caseData?.evalStatus === 'completed';
+    document.getElementById('evalDoneBanner').classList.toggle('hidden', !alreadyDone);
+    document.getElementById('evalFormCard').style.opacity = alreadyDone ? '.6' : '1';
+    document.getElementById('submitBtn').disabled = alreadyDone;
+  }
+
+  // ── Form helpers ──
+  function updateCharCount() {
+    const len = document.getElementById('diagnosis').value.length;
+    const el  = document.getElementById('diagCharCount');
+    el.textContent = `${len} characters ${len >= 30 ? '✓' : `(${30 - len} more needed)`}`;
+    el.className = 'char-count ' + (len >= 30 ? 'ok' : len > 15 ? 'warn' : '');
+  }
+
+  function toggleTreatment() {
+    const checked = document.getElementById('hasTreatment').checked;
+    document.getElementById('treatmentFields').classList.toggle('hidden', !checked);
+  }
+
+  function clearForm() {
+    ['evalType','diagnosis','treatmentPlan','treatmentDuration','referSpecialist','prognosis'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('disabilityPct').value = 0;
+    document.getElementById('pctVal').textContent = '0%';
+    document.getElementById('hasTreatment').checked = false;
+    document.getElementById('specialistRefer').checked = false;
+    document.getElementById('treatmentFields').classList.add('hidden');
+    document.getElementById('specialistField').classList.add('hidden');
+    document.getElementById('evalDate').value = new Date().toISOString().split('T')[0];
+    updateCharCount();
+    document.getElementById('formAlert').classList.remove('show');
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('formAlert');
+    el.textContent = msg;
+    el.classList.add('show');
+    document.getElementById('formSuccess').classList.remove('show');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function showSuccess(msg) {
+    const el = document.getElementById('formSuccess');
+    el.textContent = msg;
+    el.classList.add('show');
+    document.getElementById('formAlert').classList.remove('show');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ── Submit evaluation ──
+  async function submitEvaluation() {
+    if (!selectedCaseId) return showError('No case selected.');
+
+    const evalType  = document.getElementById('evalType').value;
+    const evalDate  = document.getElementById('evalDate').value;
+    const diagnosis = document.getElementById('diagnosis').value.trim();
+    const pct       = Number(document.getElementById('disabilityPct').value);
+    const prognosis = document.getElementById('prognosis').value;
+    const specialistRefer = document.getElementById('specialistRefer').checked;
+    const hasTreatment    = document.getElementById('hasTreatment').checked;
+
+    // Client-side validation
+    if (!evalType)    return showError('Please select an evaluation type.');
+    if (!evalDate)    return showError('Please select an evaluation date.');
+    if (!diagnosis)   return showError('Please enter a diagnosis.');
+    if (diagnosis.length < 30) return showError(`Diagnosis must be at least 30 characters (currently ${diagnosis.length}).`);
+    if (!prognosis)   return showError('Please select a prognosis.');
+
+    const payload = {
+      caseId: selectedCaseId,
+      evalType,
+      evalDate,
+      diagnosis,
+      disabilityPercentage: pct,
+      prognosis,
+      specialistRefer,
+      treatmentPlan:     hasTreatment ? document.getElementById('treatmentPlan').value.trim() : null,
+      treatmentDuration: hasTreatment ? document.getElementById('treatmentDuration').value.trim() : null,
+      referSpecialist:   specialistRefer ? document.getElementById('referSpecialist').value.trim() : null,
+    };
+
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<span class="spinner"></span> Submitting…';
+    btn.disabled = true;
+
+    try {
+      const fd = new FormData();
+      fd.append('data', JSON.stringify(payload));
+
+      const res = await fetch('/api/evaluation/submit', { method: 'POST', body: fd });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showError(data.message || 'Submission failed. Please try again.');
+        return;
+      }
+
+      showSuccess('✓ Evaluation submitted successfully!');
+      clearForm();
+
+      // Mark as done in local state and re-render queue
+      const idx = cases.findIndex(c => c._id?.toString() === selectedCaseId);
+      if (idx !== -1) cases[idx].evalStatus = 'completed';
+      renderQueue(cases);
+
+      document.getElementById('evalDoneBanner').classList.remove('hidden');
+      document.getElementById('evalFormCard').style.opacity = '.6';
+      btn.disabled = true;
+
+    } catch (err) {
+      showError('Network error. Please check your connection and try again.');
+    } finally {
+      if (!document.getElementById('formSuccess').classList.contains('show')) {
+        btn.innerHTML = 'Submit Evaluation';
+        btn.disabled = false;
+      } else {
+        btn.innerHTML = 'Submit Evaluation';
+      }
+    }
+  }
+</script>
+</body>
+</html>

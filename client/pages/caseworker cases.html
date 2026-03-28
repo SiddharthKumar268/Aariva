@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Cases — Aariva</title>
+  <link rel="stylesheet" href="/assets/css/tokens.css" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/components.css" />
+  <link rel="stylesheet" href="/assets/css/pages.css" /> 
+<style>
+  :root{--blue:#2563eb;--blue-light:#eff6ff;--green:#16a34a;--green-light:#f0fdf4;--yellow:#d97706;--red:#dc2626;--gray:#6b7280;--border:#e5e7eb;--bg:#f9fafb;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:#111827;min-height:100vh;}
+  .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+  .topbar .logo{font-weight:700;font-size:1.2rem;color:var(--blue);}
+  .topbar-right{display:flex;gap:.75rem;align-items:center;}
+  .btn{padding:.5rem 1.1rem;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;transition:.15s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;}
+  .btn-primary{background:var(--blue);color:#fff;}
+  .btn-primary:hover{background:#1d4ed8;}
+  .btn-outline{background:#fff;border:1.5px solid var(--border);color:#374151;}
+  .btn-outline:hover{border-color:#9ca3af;}
+  .btn-sm{padding:.35rem .8rem;font-size:.78rem;}
+  .btn-danger{background:#fef2f2;color:var(--red);border:1px solid #fca5a5;}
+
+  .layout{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 60px);}
+  .sidebar{background:#fff;border-right:1px solid var(--border);overflow-y:auto;}
+  .main{overflow-y:auto;padding:1.5rem;}
+
+  /* Sidebar */
+  .sidebar-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .sidebar-header h3{font-size:.95rem;font-weight:700;}
+  .search-box{padding:.75rem 1.2rem;border-bottom:1px solid var(--border);}
+  .search-box input{width:100%;padding:.5rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-size:.85rem;outline:none;}
+  .search-box input:focus{border-color:var(--blue);}
+  .filter-tabs{display:flex;padding:.5rem 1.2rem;gap:.4rem;border-bottom:1px solid var(--border);overflow-x:auto;}
+  .tab{padding:.3rem .7rem;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--gray);white-space:nowrap;}
+  .tab.active{background:var(--blue-light);color:var(--blue);}
+  .case-list{padding:.5rem 0;}
+  .case-item{padding:.85rem 1.2rem;border-bottom:1px solid var(--border);cursor:pointer;transition:.12s;}
+  .case-item:hover{background:var(--bg);}
+  .case-item.selected{background:var(--blue-light);border-right:3px solid var(--blue);}
+  .case-item .ci-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.3rem;}
+  .case-item .ci-name{font-size:.88rem;font-weight:600;color:#111;}
+  .badge{padding:.18rem .55rem;border-radius:20px;font-size:.7rem;font-weight:600;}
+  .badge-pending{background:#fef3c7;color:#92400e;}
+  .badge-review{background:#dbeafe;color:#1e40af;}
+  .badge-approved{background:var(--green-light);color:#166534;}
+  .badge-rejected{background:#fef2f2;color:var(--red);}
+  .badge-clarification{background:#f3e8ff;color:#6b21a8;}
+  .case-item .ci-id{font-size:.73rem;color:var(--gray);}
+  .case-item .ci-date{font-size:.73rem;color:var(--gray);}
+  .empty-list{padding:2rem;text-align:center;color:var(--gray);font-size:.85rem;}
+
+  /* Main panel */
+  .no-selection{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--gray);gap:.5rem;}
+  .no-selection .icon{font-size:3rem;}
+  .case-detail{}
+  .detail-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem;}
+  .detail-header h2{font-size:1.1rem;font-weight:700;}
+  .detail-header-id{font-size:.8rem;color:var(--gray);margin-top:.2rem;}
+  .section-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem;}
+  .section-card h4{font-size:.8rem;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.85rem;}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem;}
+  .info-item .il{font-size:.75rem;color:var(--gray);}
+  .info-item .iv{font-size:.875rem;color:#111;font-weight:500;}
+
+  /* Notes editor (Feature 04) */
+  .notes-area{width:100%;min-height:100px;padding:.65rem .85rem;border:1.5px solid var(--border);border-radius:8px;font-size:.875rem;resize:vertical;outline:none;transition:.15s;font-family:inherit;}
+  .notes-area:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+  .notes-toolbar{display:flex;justify-content:space-between;align-items:center;margin-top:.6rem;}
+  .notes-status{font-size:.75rem;color:var(--gray);}
+  .notes-status.saved{color:var(--green);}
+  .notes-history{margin-top:.85rem;display:flex;flex-direction:column;gap:.5rem;max-height:220px;overflow-y:auto;}
+  .note-entry{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.6rem .85rem;}
+  .note-entry .ne-meta{font-size:.72rem;color:var(--gray);margin-bottom:.3rem;}
+  .note-entry .ne-text{font-size:.85rem;color:#111;}
+
+  /* Timeline (Feature 15) */
+  .timeline{display:flex;flex-direction:column;gap:0;}
+  .tl-item{display:flex;gap:.85rem;padding-bottom:1rem;position:relative;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;margin-top:.1rem;}
+  .tl-dot.done{background:var(--green-light);color:var(--green);}
+  .tl-dot.active{background:var(--blue-light);color:var(--blue);}
+  .tl-dot.pending{background:#f3f4f6;color:var(--gray);}
+  .tl-line{position:absolute;left:14px;top:32px;bottom:0;width:1px;background:var(--border);}
+  .tl-item:last-child .tl-line{display:none;}
+  .tl-content .tl-stage{font-size:.875rem;font-weight:600;color:#111;}
+  .tl-content .tl-date{font-size:.75rem;color:var(--gray);}
+  .tl-content .tl-note{font-size:.8rem;color:var(--gray);margin-top:.2rem;}
+
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(37,99,235,.3);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-state{display:flex;align-items:center;justify-content:center;padding:2rem;gap:.6rem;color:var(--gray);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="logo">Aariva</span>
+  <div class="topbar-right">
+    <a href="submit-case.html" class="btn btn-primary">+ New Case</a>
+    <a href="dashboard.html" class="btn btn-outline">Dashboard</a>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- ── Sidebar: case list ── -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>My Assigned Cases</h3>
+      <span id="caseCount" style="font-size:.75rem;color:var(--gray);"></span>
+    </div>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search by name or case ID…" oninput="filterCases()"/>
+    </div>
+    <div class="filter-tabs">
+      <button class="tab active" onclick="setFilter('all',this)">All</button>
+      <button class="tab" onclick="setFilter('Pending',this)">Pending</button>
+      <button class="tab" onclick="setFilter('Under Review',this)">Under Review</button>
+      <button class="tab" onclick="setFilter('Approved',this)">Approved</button>
+      <button class="tab" onclick="setFilter('Rejected',this)">Rejected</button>
+    </div>
+    <div class="case-list" id="caseList">
+      <div class="loading-state"><div class="spinner"></div> Loading cases…</div>
+    </div>
+  </div>
+
+  <!-- ── Main: case detail ── -->
+  <div class="main" id="mainPanel">
+    <div class="no-selection" id="noSelection">
+      <div class="icon">📋</div>
+      <strong>Select a case to view details</strong>
+      <span style="font-size:.85rem;">Choose a case from the left panel</span>
+    </div>
+    <div class="case-detail hidden" id="caseDetail"></div>
+  </div>
+</div>
+
+<script>
+let allCases = [];
+let currentFilter = 'all';
+let selectedId = null;
+
+const statusBadge = {
+  'Pending': 'badge-pending',
+  'Under Review': 'badge-review',
+  'Approved': 'badge-approved',
+  'Rejected': 'badge-rejected',
+  'Clarification Requested': 'badge-clarification',
+};
+
+/* ── Load cases ── */
+async function loadCases() {
+  try {
+    const res = await fetch('/api/cases/my-cases');
+    const data = await res.json();
+    allCases = Array.isArray(data) ? data : (data.cases || []);
+    renderList();
+  } catch {
+    document.getElementById('caseList').innerHTML = '<div class="empty-list">Failed to load cases.</div>';
+  }
+}
+
+function renderList() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = allCases.filter(c => {
+    const matchFilter = currentFilter === 'all' || c.caseStatus === currentFilter;
+    const name = `${c.applicant?.firstName || ''} ${c.applicant?.lastName || ''}`.toLowerCase();
+    const matchSearch = !q || name.includes(q) || (c._id || '').toLowerCase().includes(q);
+    return matchFilter && matchSearch;
+  });
+  document.getElementById('caseCount').textContent = `${filtered.length} case${filtered.length !== 1 ? 's' : ''}`;
+  if (!filtered.length) {
+    document.getElementById('caseList').innerHTML = '<div class="empty-list">No cases found.</div>';
+    return;
+  }
+  document.getElementById('caseList').innerHTML = filtered.map(c => {
+    const name = `${c.applicant?.firstName || 'Unknown'} ${c.applicant?.lastName || ''}`;
+    const badge = statusBadge[c.caseStatus] || 'badge-pending';
+    const date = c.submissionDate ? new Date(c.submissionDate).toLocaleDateString() : '—';
+    return `
+      <div class="case-item ${c._id === selectedId ? 'selected' : ''}" onclick="selectCase('${c._id}')">
+        <div class="ci-top">
+          <span class="ci-name">${name}</span>
+          <span class="badge ${badge}">${c.caseStatus || 'Pending'}</span>
+        </div>
+        <div class="ci-id">ID: ${(c._id || '').slice(-8).toUpperCase()}</div>
+        <div class="ci-date">${date} · ${c.disability?.type || '—'}</div>
+      </div>`;
+  }).join('');
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+function filterCases() { renderList(); }
+
+/* ── Select case ── */
+async function selectCase(id) {
+  selectedId = id;
+  renderList();
+  document.getElementById('noSelection').classList.add('hidden');
+  const detail = document.getElementById('caseDetail');
+  detail.classList.remove('hidden');
+  detail.innerHTML = '<div class="loading-state"><div class="spinner"></div> Loading…</div>';
+
+  try {
+    const res = await fetch(`/api/cases/${id}`);
+    const c = await res.json();
+    renderDetail(c);
+  } catch {
+    detail.innerHTML = '<p style="color:var(--red);padding:1rem;">Failed to load case details.</p>';
+  }
+}
+
+/* ── Render detail ── */
+function renderDetail(c) {
+  const name = `${c.applicant?.firstName || ''} ${c.applicant?.lastName || ''}`;
+  const badge = statusBadge[c.caseStatus] || 'badge-pending';
+  const timeline = buildTimeline(c);
+  const notes = (c.notes || []);
+
+  document.getElementById('caseDetail').innerHTML = `
+    <div class="detail-header">
+      <div>
+        <h2>${name} <span class="badge ${badge}" style="font-size:.8rem;">${c.caseStatus || 'Pending'}</span></h2>
+        <div class="detail-header-id">Case ID: ${c._id} · Submitted: ${c.submissionDate ? new Date(c.submissionDate).toLocaleDateString() : '—'}</div>
+      </div>
+      <div style="display:flex;gap:.5rem;">
+        <a href="track-case.html?id=${c._id}" class="btn btn-outline btn-sm">Track Status</a>
+      </div>
+    </div>
+
+    <!-- Personal Info -->
+    <div class="section-card">
+      <h4>Personal Details</h4>
+      <div class="info-grid">
+        ${infoItem('Full Name', name)}
+        ${infoItem('Date of Birth', c.applicant?.dob || '—')}
+        ${infoItem('Gender', c.applicant?.gender || '—')}
+        ${infoItem('Email', c.applicant?.email || '—')}
+        ${infoItem('Phone', c.applicant?.phone || '—')}
+        ${infoItem('Address', c.applicant?.address || '—')}
+      </div>
+    </div>
+
+    <!-- Disability Info -->
+    <div class="section-card">
+      <h4>Disability Information</h4>
+      <div class="info-grid">
+        ${infoItem('Type', c.disability?.type || '—')}
+        ${infoItem('Severity', c.disability?.severity || '—')}
+        ${infoItem('Onset Date', c.disability?.onsetDate || '—')}
+        ${infoItem('Affected Areas', c.disability?.affectedAreas || '—')}
+      </div>
+      <div style="margin-top:.75rem;">
+        <div class="il" style="font-size:.75rem;color:var(--gray);margin-bottom:.3rem;">Description</div>
+        <div style="font-size:.875rem;">${c.disability?.description || '—'}</div>
+      </div>
+    </div>
+
+    <!-- Status Timeline (Feature 15) -->
+    <div class="section-card">
+      <h4>Case Status Timeline</h4>
+      <div class="timeline">${timeline}</div>
+    </div>
+
+    <!-- Case Notes (Feature 04) -->
+    <div class="section-card">
+      <h4>Case Notes</h4>
+      <div class="notes-history" id="notesHistory">
+        ${notes.length ? notes.map(n => `
+          <div class="note-entry">
+            <div class="ne-meta">${n.author || 'Case Worker'} · ${n.createdAt ? new Date(n.createdAt).toLocaleString() : '—'}</div>
+            <div class="ne-text">${n.text}</div>
+          </div>`).join('') : '<p style="font-size:.82rem;color:var(--gray);">No notes yet.</p>'}
+      </div>
+      <textarea class="notes-area" id="noteInput" placeholder="Add a case note…" style="margin-top:.85rem;"></textarea>
+      <div class="notes-toolbar">
+        <span class="notes-status" id="noteStatus"></span>
+        <button class="btn btn-primary btn-sm" onclick="saveNote('${c._id}')">Save Note</button>
+      </div>
+    </div>
+  `;
+}
+
+function infoItem(label, val) {
+  return `<div class="info-item"><div class="il">${label}</div><div class="iv">${val}</div></div>`;
+}
+
+/* ── Timeline ── */
+function buildTimeline(c) {
+  const stages = [
+    {label:'Case Submitted', key:'submitted', note: c.submissionDate ? new Date(c.submissionDate).toLocaleDateString() : null},
+    {label:'Under Review', key:'review', note: null},
+    {label:'Medical Evaluation', key:'evaluation', note: null},
+    {label:'Admin Decision', key:'decision', note: null},
+    {label:'Case Closed', key:'closed', note: null},
+  ];
+  const statusOrder = ['Pending','Under Review','Medical Evaluation','Approved','Rejected'];
+  const currentIdx = statusOrder.indexOf(c.caseStatus);
+
+  return stages.map((s, i) => {
+    let state = 'pending';
+    if (i === 0) state = 'done';
+    else if (i <= currentIdx) state = 'done';
+    else if (i === currentIdx + 1) state = 'active';
+    const icon = state === 'done' ? '✓' : state === 'active' ? '●' : '○';
+    return `
+      <div class="tl-item">
+        <div class="tl-dot ${state}">${icon}</div>
+        <div class="tl-line"></div>
+        <div class="tl-content">
+          <div class="tl-stage">${s.label}</div>
+          ${s.note ? `<div class="tl-date">${s.note}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ── Save Note (Feature 04) ── */
+async function saveNote(caseId) {
+  const text = document.getElementById('noteInput').value.trim();
+  const statusEl = document.getElementById('noteStatus');
+  if (!text) { statusEl.textContent = 'Note cannot be empty'; statusEl.className = 'notes-status'; return; }
+  statusEl.textContent = 'Saving…';
+  try {
+    const res = await fetch(`/api/cases/${caseId}/notes`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({text})
+    });
+    const data = await res.json();
+    if (res.ok) {
+      statusEl.textContent = '✓ Note saved';
+      statusEl.className = 'notes-status saved';
+      document.getElementById('noteInput').value = '';
+      // Append note to history
+      const history = document.getElementById('notesHistory');
+      const entry = document.createElement('div');
+      entry.className = 'note-entry';
+      entry.innerHTML = `<div class="ne-meta">You · Just now</div><div class="ne-text">${text}</div>`;
+      if (history.querySelector('p')) history.innerHTML = '';
+      history.appendChild(entry);
+    } else {
+      statusEl.textContent = data.message || 'Failed to save';
+    }
+  } catch {
+    statusEl.textContent = 'Network error';
+  }
+}
+
+loadCases();
+</script>
+</body>
+<footer style="width:100%;background:#0e0f14;border-top:1px solid #1e2029;padding:18px 24px;font-family:'DM Sans','Segoe UI',sans-serif;font-size:13px;color:#4b5068;box-sizing:border-box;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+    <span>© 2025 Aariva</span>
+    <span style="color:#2a2d3a;">·</span>
+    <span>Built with <span style="color:#4f8ef7;font-size:13px;">♥</span> by <strong style="color:#a0aec0;font-weight:600;">Siddharth Kumar</strong></span>
+  </div>
+</footer>
+</html>

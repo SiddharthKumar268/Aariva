@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aariva — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="../assets/css/login.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="login-wrapper">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-logo">
+      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 3L25 9V19L14 25L3 19V9L14 3Z" stroke="#c8a96e" stroke-width="1.5" fill="none"/>
+        <circle cx="14" cy="14" r="4" fill="#c8a96e"/>
+        <path d="M14 7V10M14 18V21M7 14H10M18 14H21" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1>Aariva</h1>
+    <p>Disability Management System</p>
+  </div>
+
+  <!-- Card -->
+  <div class="card">
+
+    <!-- Steps indicator -->
+    <div class="steps-indicator" id="steps-indicator">
+      <div class="step-item">
+        <div class="step-dot active" id="dot-1">1</div>
+        <div class="step-label">Credentials</div>
+      </div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-item">
+        <div class="step-dot inactive" id="dot-2">2</div>
+        <div class="step-label">Verify OTP</div>
+      </div>
+    </div>
+
+    <!-- ── STEP 1: Login ── -->
+    <div id="step-login">
+      <div class="step-header">
+        <div class="step-badge"><span class="dot"></span> Secure Login</div>
+        <h2>Welcome back</h2>
+        <p>Enter your credentials to access your account.</p>
+      </div>
+
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="you@hospital.org" autocomplete="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required />
+            <button type="button" class="toggle-pw" onclick="togglePassword()" aria-label="Toggle password visibility">
+              <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="login-btn">Continue →</button>
+        <div class="msg" id="login-error"></div>
+      </form>
+
+      <div class="card-footer">
+        Don't have an account? <a href="register.html">Register here</a>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: OTP ── -->
+    <div id="step-otp" style="display:none;">
+      <div class="step-header">
+        <div class="step-badge"><span class="dot"></span> Two-Factor Auth</div>
+        <h2>Check your email</h2>
+        <p>We sent a 6-digit verification code to your email.</p>
+      </div>
+
+      <div class="otp-hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        <span id="otp-email-hint">OTP sent to your email</span>
+      </div>
+
+      <form id="otp-form" novalidate>
+        <div class="form-group">
+          <label>Enter OTP</label>
+          <div class="otp-boxes" id="otp-boxes">
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" id="otp-0" />
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-1" />
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-2" />
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-3" />
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-4" />
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-5" />
+          </div>
+        </div>
+
+        <div class="otp-expiry">Code expires in <span id="otp-timer">5:00</span></div>
+
+        <button type="submit" class="btn-primary" id="otp-btn" style="margin-top:16px;">Verify &amp; Login</button>
+        <div class="msg" id="otp-error"></div>
+        <div class="msg" id="otp-success"></div>
+      </form>
+
+      <div class="actions-row">
+        <button class="btn-ghost" id="back-to-login">← Back to login</button>
+        <button class="btn-ghost" id="resend-btn" disabled>Resend OTP (30s)</button>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /wrapper ← footer goes AFTER this, not inside -->
+
+<!-- ✅ FOOTER: outside .login-wrapper so it spans full width -->
+<footer style="width:100%;background:#0e0f14;border-top:1px solid #1e2029;padding:18px 24px;font-family:'DM Sans','Segoe UI',sans-serif;font-size:13px;color:#4b5068;box-sizing:border-box;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+    <span>© 2025 Aariva</span>
+    <span style="color:#2a2d3a;">·</span>
+    <span>Built with <span style="color:#4f8ef7;">♥</span> by <strong style="color:#a0aec0;font-weight:600;">Siddharth Kumar</strong></span>
+  </div>
+</footer>
+
+<!-- EmailJS SDK -->
+<script src="https://unpkg.com/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- Config -->
+<script src="../assets/js/config.js"></script>
+<!-- Auth logic -->
+<script src="../assets/js/auth.js"></script>
+<!-- Chatbot -->
+<script src="/assets/js/chatbot.js"></script>
+
+<script>
+  function togglePassword() {
+    const pw = document.getElementById('password');
+    const icon = document.getElementById('eye-icon');
+    const isHidden = pw.type === 'password';
+    pw.type = isHidden ? 'text' : 'password';
+    icon.innerHTML = isHidden
+      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`
+      : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  }
+
+  function updateStepsIndicator(step) {
+    if (step === 2) {
+      document.getElementById('dot-1').className = 'step-dot done';
+      document.getElementById('dot-1').textContent = '✓';
+      document.getElementById('line-1').className = 'step-line done';
+      document.getElementById('dot-2').className = 'step-dot active';
+    } else {
+      document.getElementById('dot-1').className = 'step-dot active';
+      document.getElementById('dot-1').textContent = '1';
+      document.getElementById('line-1').className = 'step-line';
+      document.getElementById('dot-2').className = 'step-dot inactive';
+    }
+  }
+
+  const _origShowOTPStep = typeof showOTPStep !== 'undefined' ? showOTPStep : null;
+  window.showOTPStep = function(email) {
+    if (_origShowOTPStep) _origShowOTPStep(email);
+    updateStepsIndicator(2);
+    startOTPTimer();
+    setTimeout(() => document.getElementById('otp-0')?.focus(), 100);
+  }
+
+  let otpTimerInterval = null;
+  function startOTPTimer(seconds = 300) {
+    clearInterval(otpTimerInterval);
+    const timerEl = document.getElementById('otp-timer');
+    if (!timerEl) return;
+    let remaining = seconds;
+    timerEl.style.color = '';
+    otpTimerInterval = setInterval(() => {
+      const m = Math.floor(remaining / 60);
+      const s = remaining % 60;
+      timerEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+      remaining--;
+      if (remaining < 0) {
+        clearInterval(otpTimerInterval);
+        timerEl.textContent = 'Expired';
+        timerEl.style.color = 'var(--error)';
+      }
+    }, 1000);
+  }
+
+  (function initOTPBoxes() {
+    const boxes = Array.from(document.querySelectorAll('.otp-box'));
+    if (!boxes.length) return;
+    boxes.forEach((box, i) => {
+      box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') {
+          if (box.value) { box.value = ''; box.classList.remove('filled'); }
+          else if (i > 0) { boxes[i-1].focus(); boxes[i-1].value = ''; boxes[i-1].classList.remove('filled'); }
+          e.preventDefault(); return;
+        }
+        if (e.key === 'ArrowLeft'  && i > 0) { boxes[i-1].focus(); return; }
+        if (e.key === 'ArrowRight' && i < 5) { boxes[i+1].focus(); return; }
+        if (!/^[0-9]$/.test(e.key) && !['Tab','Enter'].includes(e.key)) e.preventDefault();
+      });
+      box.addEventListener('input', (e) => {
+        const val = e.target.value.replace(/\D/g, '');
+        if (val.length > 1) {
+          val.split('').forEach((ch, j) => { if (boxes[j]) { boxes[j].value = ch; boxes[j].classList.add('filled'); } });
+          boxes[Math.min(val.length, 5)].focus(); return;
+        }
+        box.value = val;
+        if (val) { box.classList.add('filled'); if (i < 5) boxes[i+1].focus(); }
+        else box.classList.remove('filled');
+      });
+      box.addEventListener('focus', () => box.select());
+    });
+    const otpForm = document.getElementById('otp-form');
+    if (otpForm) {
+      otpForm.addEventListener('submit', function() {
+        const code = boxes.map(b => b.value).join('');
+        window.__otpValue = code;
+        let hidden = document.getElementById('otp-input');
+        if (!hidden) { hidden = document.createElement('input'); hidden.type = 'hidden'; hidden.id = 'otp-input'; otpForm.appendChild(hidden); }
+        hidden.value = code;
+      }, true);
+    }
+  })();
+
+  function showMsg(el, type, text) { if (!el) return; el.textContent = text; el.className = 'msg ' + type; }
+  function hideMsg(el) { if (!el) return; el.textContent = ''; el.className = 'msg'; }
+  window.showError   = (id, txt) => showMsg(document.getElementById(id), 'error', txt);
+  window.showSuccess = (id, txt) => showMsg(document.getElementById(id), 'success', txt);
+  window.hideMsg     = (id)      => hideMsg(document.getElementById(id));
+</script>
+
+</body>
+</html>

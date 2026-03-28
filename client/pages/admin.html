@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Dashboard — Aariva</title>
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+</head>
+<body>
+
+<div class="topbar">
+  <span class="logo">Aariva — Admin</span>
+  <div style="display:flex;gap:.6rem;">
+    <a href="dashboard.html" class="btn btn-outline btn-sm">← Dashboard</a>
+  </div>
+</div>
+
+<!-- Nav -->
+<div class="admin-nav">
+  <button class="nav-tab active" onclick="switchTab('cases',this)">Case Management</button>
+  <button class="nav-tab" onclick="switchTab('audit',this)">Audit Logs</button>
+</div>
+
+<!-- ─── CASES TAB ─── -->
+<div class="tab-panel active" id="tab-cases">
+  <!-- Stats -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card pending"><div class="sv" id="sPending">—</div><div class="sl">Pending</div></div>
+    <div class="stat-card review"><div class="sv" id="sReview">—</div><div class="sl">Under Review</div></div>
+    <div class="stat-card approved"><div class="sv" id="sApproved">—</div><div class="sl">Approved</div></div>
+    <div class="stat-card rejected"><div class="sv" id="sRejected">—</div><div class="sl">Rejected</div></div>
+    <div class="stat-card escalated"><div class="sv" id="sEscalated">—</div><div class="sl">Escalated</div></div>
+  </div>
+
+  <!-- Filters (Feature 10) -->
+  <div class="filters">
+    <input type="text" id="caseSearch" placeholder="Search name or case ID…" oninput="renderCases()"/>
+    <select id="statusFilter" onchange="renderCases()">
+      <option value="">All Statuses</option>
+      <option>Pending</option>
+      <option>Under Review</option>
+      <option>Approved</option>
+      <option>Rejected</option>
+      <option>Clarification Requested</option>
+      <option>Escalated</option>
+    </select>
+    <select id="severityFilter" onchange="renderCases()">
+      <option value="">All Severities</option>
+      <option>Mild</option><option>Moderate</option><option>Severe</option>
+    </select>
+    <button class="btn btn-outline btn-sm no-print" onclick="window.print()">🖨 Print</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Case ID</th>
+          <th>Applicant</th>
+          <th>Disability Type</th>
+          <th>Severity</th>
+          <th>Submitted</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="caseTableBody">
+        <tr class="loading-row"><td colspan="7"><div class="spinner spinner-dark"></div> Loading cases…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─── AUDIT LOG TAB (Feature 14) ─── -->
+<div class="tab-panel" id="tab-audit">
+  <div class="log-filters">
+    <button class="log-filter-btn active" onclick="filterLogs('all',this)">All Actions</button>
+    <button class="log-filter-btn" onclick="filterLogs('create',this)">Submissions</button>
+    <button class="log-filter-btn" onclick="filterLogs('approve',this)">Approvals</button>
+    <button class="log-filter-btn" onclick="filterLogs('reject',this)">Rejections</button>
+    <button class="log-filter-btn" onclick="filterLogs('clarify',this)">Clarifications</button>
+    <button class="log-filter-btn" onclick="filterLogs('eval',this)">Evaluations</button>
+  </div>
+  <div class="log-list" id="logList">
+    <div style="text-align:center;padding:2rem;color:var(--gray);">
+      <div class="spinner spinner-dark"></div> Loading audit logs…
+    </div>
+  </div>
+</div>
+
+<!-- ─── DECISION MODAL (Features 11+12) ─── -->
+<div class="modal-overlay hidden" id="decisionModal">
+  <div class="modal">
+    <h3 id="modalTitle">Decision</h3>
+    <div class="modal-sub" id="modalSub"></div>
+    <label id="remarksLabel">Remarks / Justification *</label>
+    <textarea id="remarksInput" placeholder="Provide written justification for this decision…"></textarea>
+    <div class="modal-err" id="remarksErr">Remarks are required before submitting a decision.</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn" id="confirmBtn" onclick="confirmDecision()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CASE SUMMARY MODAL (Feature 13) ─── -->
+<div class="modal-overlay hidden" id="summaryModal">
+  <div class="modal summary-modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <h3>Case Summary Report</h3>
+      <div style="display:flex;gap:.5rem;">
+        <button class="btn btn-outline btn-sm" onclick="window.print()">🖨 Print</button>
+        <button class="btn btn-outline btn-sm" onclick="closeSummary()">✕ Close</button>
+      </div>
+    </div>
+    <div id="summaryContent"></div>
+  </div>
+</div>
+
+<script>
+let allCases = [];
+let allLogs = [];
+let pendingAction = null; // {caseId, type}
+let logFilter = 'all';
+
+const statusBadge = {
+  'Pending':'badge-pending','Under Review':'badge-review',
+  'Approved':'badge-approved','Rejected':'badge-rejected',
+  'Clarification Requested':'badge-clarification','Escalated':'badge-escalated'
+};
+
+/* ── Tab switch ── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'audit' && !allLogs.length) loadLogs();
+}
+
+/* ── Load cases ── */
+async function loadCases() {
+  try {
+    const res = await fetch('/api/admin/cases');
+    const data = await res.json();
+    allCases = Array.isArray(data) ? data : (data.cases || []);
+    updateStats();
+    renderCases();
+  } catch {
+    document.getElementById('caseTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--red);">Failed to load cases.</td></tr>';
+  }
+}
+
+/* ── Stats ── */
+function updateStats() {
+  const count = s => allCases.filter(c => c.caseStatus === s).length;
+  document.getElementById('sPending').textContent  = count('Pending');
+  document.getElementById('sReview').textContent   = count('Under Review');
+  document.getElementById('sApproved').textContent = count('Approved');
+  document.getElementById('sRejected').textContent = count('Rejected');
+  document.getElementById('sEscalated').textContent = allCases.filter(c => c.escalated).length;
+}
+
+/* ── Render table (Feature 10) ── */
+function renderCases() {
+  const q = document.getElementById('caseSearch').value.toLowerCase();
+  const st = document.getElementById('statusFilter').value;
+  const sv = document.getElementById('severityFilter').value;
+  const filtered = allCases.filter(c => {
+    const name = `${c.applicant?.firstName || ''} ${c.applicant?.lastName || ''}`.toLowerCase();
+    return (!q || name.includes(q) || (c._id||'').toLowerCase().includes(q))
+      && (!st || c.caseStatus === st)
+      && (!sv || c.disability?.severity === sv);
+  });
+  if (!filtered.length) {
+    document.getElementById('caseTableBody').innerHTML = '<tr><td colspan="7" class="empty-table">No cases match your filters.</td></tr>';
+    return;
+  }
+  document.getElementById('caseTableBody').innerHTML = filtered.map(c => {
+    const name = `${c.applicant?.firstName||'?'} ${c.applicant?.lastName||''}`;
+    const badge = statusBadge[c.caseStatus] || 'badge-pending';
+    const date = c.submissionDate ? new Date(c.submissionDate).toLocaleDateString() : '—';
+    const canDecide = !['Approved','Rejected'].includes(c.caseStatus);
+    return `
+      <tr>
+        <td style="font-size:.78rem;font-family:monospace;">${(c._id||'').slice(-8).toUpperCase()}</td>
+        <td><strong>${name}</strong></td>
+        <td>${c.disability?.type || '—'}</td>
+        <td>${c.disability?.severity || '—'}</td>
+        <td>${date}</td>
+        <td><span class="badge ${badge}">${c.caseStatus || 'Pending'}</span>${c.escalated ? ' <span class="badge badge-escalated">⚑</span>' : ''}</td>
+        <td>
+          <div class="actions-cell">
+            <button class="btn btn-outline btn-xs" onclick="showSummary('${c._id}')">Summary</button>
+            ${canDecide ? `
+              <button class="btn btn-success btn-xs" onclick="openModal('${c._id}','approve')">Approve</button>
+              <button class="btn btn-danger btn-xs" onclick="openModal('${c._id}','reject')">Reject</button>
+              <button class="btn btn-warn btn-xs" onclick="openModal('${c._id}','clarify')">Clarify</button>
+            ` : ''}
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+/* ── Decision Modal (Feature 11+12) ── */
+function openModal(caseId, type) {
+  pendingAction = {caseId, type};
+  const titles = {approve:'Approve Case', reject:'Reject Case', clarify:'Request Clarification'};
+  const subs = {
+    approve: 'This case will be marked as Approved. Written justification is required.',
+    reject:  'This case will be marked as Rejected. Written justification is required.',
+    clarify: 'Flag this case and notify the case worker to provide more information.'
+  };
+  const btnClasses = {approve:'btn-success', reject:'btn-danger', clarify:'btn-primary'};
+  document.getElementById('modalTitle').textContent = titles[type];
+  document.getElementById('modalSub').textContent = subs[type];
+  document.getElementById('confirmBtn').className = `btn ${btnClasses[type]}`;
+  document.getElementById('confirmBtn').textContent = titles[type];
+  document.getElementById('remarksInput').value = '';
+  document.getElementById('remarksErr').style.display = 'none';
+  const overlay = document.getElementById('decisionModal');
+  overlay.className = `modal-overlay modal-type-${type}`;
+}
+
+function closeModal() {
+  document.getElementById('decisionModal').className = 'modal-overlay hidden';
+  pendingAction = null;
+}
+
+async function confirmDecision() {
+  const remarks = document.getElementById('remarksInput').value.trim();
+  if (!remarks) { document.getElementById('remarksErr').style.display = 'block'; return; }
+  document.getElementById('remarksErr').style.display = 'none';
+
+  const btn = document.getElementById('confirmBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Processing…';
+
+  const endpoints = {
+    approve: `/api/admin/cases/${pendingAction.caseId}/approve`,
+    reject:  `/api/admin/cases/${pendingAction.caseId}/reject`,
+    clarify: `/api/admin/cases/${pendingAction.caseId}/clarify`,
+  };
+  try {
+    const res = await fetch(endpoints[pendingAction.type], {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({remarks})
+    });
+    if (res.ok) {
+      closeModal();
+      loadCases();
+    } else {
+      const d = await res.json();
+      alert(d.message || 'Action failed');
+    }
+  } catch { alert('Network error'); }
+  btn.disabled = false;
+}
+
+/* ── Case Summary (Feature 13) ── */
+async function showSummary(caseId) {
+  document.getElementById('summaryContent').innerHTML = '<div style="text-align:center;padding:2rem;"><div class="spinner spinner-dark"></div></div>';
+  document.getElementById('summaryModal').classList.remove('hidden');
+  try {
+    const res = await fetch(`/api/admin/cases/${caseId}/summary`);
+    const c = await res.json();
+    renderSummary(c);
+  } catch {
+    document.getElementById('summaryContent').innerHTML = '<p style="color:var(--red);">Failed to load summary.</p>';
+  }
+}
+
+function renderSummary(c) {
+  const name = `${c.applicant?.firstName||''} ${c.applicant?.lastName||''}`;
+  const decisions = (c.decisions || []).map(d => `
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.65rem .9rem;margin-bottom:.5rem;">
+      <div style="display:flex;justify-content:space-between;">
+        <strong style="font-size:.85rem;">${d.decisionType || '—'}</strong>
+        <span style="font-size:.75rem;color:var(--gray);">${d.decisionDate ? new Date(d.decisionDate).toLocaleDateString() : '—'}</span>
+      </div>
+      <div style="font-size:.8rem;margin-top:.3rem;">${d.remarks || '—'}</div>
+    </div>`).join('') || '<p style="font-size:.82rem;color:var(--gray);">No decisions yet.</p>';
+
+  const evaluations = (c.evaluations || []).map(e => `
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.65rem .9rem;margin-bottom:.5rem;">
+      <div style="font-size:.82rem;font-weight:600;">${e.evalType || 'Evaluation'} — ${e.prognosis || '—'}</div>
+      <div style="font-size:.8rem;margin-top:.3rem;">${e.diagnosis || '—'}</div>
+    </div>`).join('') || '<p style="font-size:.82rem;color:var(--gray);">No evaluations yet.</p>';
+
+  document.getElementById('summaryContent').innerHTML = `
+    <div class="summary-section">
+      <h5>Personal Details</h5>
+      <div class="summary-grid">
+        ${si('Full Name', name)}${si('Date of Birth', c.applicant?.dob||'—')}
+        ${si('Gender', c.applicant?.gender||'—')}${si('Email', c.applicant?.email||'—')}
+        ${si('Phone', c.applicant?.phone||'—')}${si('Address', c.applicant?.address||'—')}
+      </div>
+    </div>
+    <hr class="divider"/>
+    <div class="summary-section">
+      <h5>Disability Information</h5>
+      <div class="summary-grid">
+        ${si('Type', c.disability?.type||'—')}${si('Severity', c.disability?.severity||'—')}
+        ${si('Onset Date', c.disability?.onsetDate||'—')}${si('Current Status', c.caseStatus||'—')}
+      </div>
+      <div style="margin-top:.6rem;font-size:.85rem;">${c.disability?.description||'—'}</div>
+    </div>
+    <hr class="divider"/>
+    <div class="summary-section"><h5>Medical Evaluations</h5>${evaluations}</div>
+    <hr class="divider"/>
+    <div class="summary-section"><h5>Admin Decisions</h5>${decisions}</div>`;
+}
+
+function si(label, val) {
+  return `<div class="summary-item"><div class="sl">${label}</div><div class="sv2">${val}</div></div>`;
+}
+
+function closeSummary() {
+  document.getElementById('summaryModal').classList.add('hidden');
+}
+
+/* ── Audit Logs (Feature 14) ── */
+async function loadLogs() {
+  try {
+    const res = await fetch('/api/admin/logs');
+    const data = await res.json();
+    allLogs = Array.isArray(data) ? data : (data.logs || []);
+    renderLogs();
+  } catch {
+    document.getElementById('logList').innerHTML = '<p style="text-align:center;color:var(--red);padding:2rem;">Failed to load logs.</p>';
+  }
+}
+
+function filterLogs(type, btn) {
+  logFilter = type;
+  document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLogs();
+}
+
+function renderLogs() {
+  const filtered = allLogs.filter(l => logFilter === 'all' || l.actionType === logFilter);
+  if (!filtered.length) {
+    document.getElementById('logList').innerHTML = '<p style="text-align:center;color:var(--gray);padding:2rem;">No logs found.</p>';
+    return;
+  }
+  const icons = {create:'📝',approve:'✅',reject:'❌',clarify:'💬',eval:'🩺',note:'📌'};
+  document.getElementById('logList').innerHTML = filtered.map(l => `
+    <div class="log-item">
+      <div class="log-dot ${l.actionType || 'note'}">${icons[l.actionType] || '•'}</div>
+      <div class="log-content">
+        <div class="lc-action">${l.description || l.action || 'Action performed'}</div>
+        <div class="lc-meta">${l.actor || 'System'} · ${l.createdAt ? new Date(l.createdAt).toLocaleString() : '—'}</div>
+        ${l.details ? `<div class="lc-detail">${l.details}</div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+/* ── Init ── */
+loadCases();
+</script>
+</body>
+<!-- ── Aariva Footer ── paste just before </body> in every HTML file ── -->
+<footer id="aariva-footer">
+  <div class="af-inner">
+    <span class="af-copy">© <span id="af-year"></span> Aariva</span>
+    <span class="af-sep">·</span>
+    <span class="af-built">Built with <span class="af-heart">♥</span> by <strong>Siddharth Kumar</strong></span>
+  </div>
+</footer>
+
+<style>
+  #aariva-footer {
+    width: 100%;
+    background: #0e0f14;
+    border-top: 1px solid #1e2029;
+    padding: 18px 24px;
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    font-size: 13px;
+    color: #4b5068;
+    box-sizing: border-box;
+  }
+  .af-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .af-sep { color: #2a2d3a; }
+  .af-built strong {
+    color: #a0aec0;
+    font-weight: 600;
+  }
+  .af-heart {
+    color: #4f8ef7;
+    font-size: 13px;
+  }
+</style>
+
+<script>
+  document.getElementById('af-year').textContent = new Date().getFullYear();
+</script>
+
+</html>
